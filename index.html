@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TAC Fundi — Personal Ledger</title>
+<style>
+:root{
+  --paper:#e8e4d9;--paper-line:#c9c3b2;--card:#f3f1e9;--ink:#1b2a4a;--ink-soft:#4d5a72;
+  --gold:#8a6d1e;--gold-bg:#f1e6c4;--brick:#93362a;--brick-bg:#f2ddd8;--teal:#1f5c50;--teal-bg:#d9e6e2;
+  --shadow:0 8px 24px -12px rgba(27,42,74,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  background:repeating-linear-gradient(180deg,transparent,transparent 34px,rgba(27,42,74,0.05) 35px),var(--paper);
+  color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;
+  display:flex;justify-content:center;padding:24px 14px calc(64px + env(safe-area-inset-bottom));
+}
+.sheet{width:100%;max-width:680px;}
+header{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px double var(--ink);padding-bottom:12px;margin-bottom:16px;}
+header .brand{font-weight:800;font-size:1.7rem;letter-spacing:-0.02em;}
+header .brand em{font-style:normal;color:var(--gold);}
+header .tagline{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);}
+header .date{font-size:0.72rem;color:var(--ink-soft);text-align:right;}
+
+.sync-bar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--paper-line);border-radius:10px;padding:10px 12px;margin-bottom:20px;font-size:0.82rem;
+}
+.sync-bar .status-text{color:var(--ink-soft);flex:1;min-width:140px;}
+.sync-bar input{
+  flex:1;min-width:140px;padding:10px;font-size:16px;border:1px solid var(--paper-line);
+  border-radius:7px;font-family:inherit;
+}
+.sync-bar button{
+  padding:10px 16px;min-height:44px;border:none;border-radius:7px;background:var(--ink);color:var(--paper);
+  font-weight:600;font-size:0.85rem;cursor:pointer;
+}
+.sync-bar button:hover{background:var(--teal);}
+.sync-bar button.link-btn{background:none;color:var(--brick);text-decoration:underline;padding:8px 4px;min-height:auto;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;background:#9a9384;flex-shrink:0;}
+.dot.on{background:var(--teal);}
+.dot.pending{background:var(--gold);}
+.dot.off{background:var(--brick);}
+
+.stamps{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;margin-bottom:24px;}
+.stamp{border:2px dashed currentColor;border-radius:12px;padding:12px 8px;text-align:center;background:var(--card);}
+.stamp.income{color:var(--gold);background:var(--gold-bg);}
+.stamp.expenses{color:var(--brick);background:var(--brick-bg);}
+.stamp.balance{color:var(--teal);background:var(--teal-bg);}
+.stamp h3{font-weight:700;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.85;margin-bottom:5px;}
+.stamp p{font-weight:800;font-size:1.05rem;color:var(--ink);word-break:break-word;}
+
+form{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:16px;box-shadow:var(--shadow);margin-bottom:24px;}
+.form-title{font-weight:700;font-size:0.8rem;letter-spacing:0.04em;margin-bottom:10px;color:var(--ink-soft);text-transform:uppercase;}
+.row{display:flex;gap:10px;margin-bottom:10px;}
+.row:last-child{margin-bottom:0;}
+input,select,button{font-family:inherit;font-size:16px;padding:12px;border:1px solid var(--paper-line);border-radius:8px;background:#fff;color:var(--ink);min-height:44px;}
+input{flex:1;min-width:0;}
+select{flex:0 0 120px;}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
+.btn-add{flex:0 0 auto;background:var(--ink);color:var(--paper);border:none;font-weight:700;cursor:pointer;padding:12px 22px;}
+.btn-add:hover{background:var(--teal);}
+.btn-add:disabled{opacity:0.6;}
+
+.ledger{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+.ledger-head{display:grid;grid-template-columns:1fr 1.5fr 1fr 32px;gap:6px;padding:10px 12px;background:var(--ink);color:var(--paper);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;}
+.ledger-head span:nth-child(3){text-align:right;}
+.ledger-body{max-height:420px;overflow-y:auto;}
+.entry{display:grid;grid-template-columns:1fr 1.5fr 1fr 32px;gap:6px;padding:12px;align-items:center;border-bottom:1px solid var(--paper-line);font-size:0.85rem;}
+.entry:last-child{border-bottom:none;}
+.entry:nth-child(even){background:rgba(27,42,74,0.03);}
+.entry .desc{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.entry .date-cell{font-size:0.68rem;color:var(--ink-soft);}
+.entry .amt{text-align:right;font-weight:600;}
+.entry .amt.credit{color:var(--gold);}
+.entry .amt.debit{color:var(--brick);}
+.void-btn{background:none;border:none;color:var(--brick);cursor:pointer;font-size:1.1rem;width:36px;height:36px;border-radius:50%;justify-self:end;}
+.void-btn:hover{background:var(--brick-bg);}
+
+.empty-state{padding:32px 18px;text-align:center;color:var(--ink-soft);font-size:0.88rem;}
+.empty-state strong{display:block;font-weight:700;color:var(--ink);margin-bottom:4px;}
+
+footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft);letter-spacing:0.03em;}
+
+@media (max-width:480px){
+  .stamps{grid-template-columns:1fr 1fr;}
+  .stamps .stamp:nth-child(3){grid-column:1/3;}
+  .ledger-head,.entry{grid-template-columns:0.9fr 1.4fr 0.9fr 32px;}
+  .row{flex-wrap:wrap;}
+  select{flex:1 1 100%;}
+  .sync-bar{font-size:0.78rem;}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <div>
+      <div class="brand">TAC <em>Fundi</em></div>
+      <div class="tagline">Personal Ledger</div>
+    </div>
+    <div class="date" id="today"></div>
+  </header>
+
+  <div class="sync-bar" id="sync-bar">
+    <span class="dot off" id="sync-dot"></span>
+    <span class="status-text" id="sync-status">Not connected — saving to this device only</span>
+    <input type="text" id="sync-code-input" placeholder="Your sync code (any word/phrase)" style="display:none" autocomplete="off" />
+    <button id="sync-connect-btn" type="button">Connect sync</button>
+    <button class="link-btn" id="sync-forget-btn" type="button" style="display:none">Disconnect</button>
+  </div>
+
+  <div class="stamps">
+    <div class="stamp income"><h3>Income</h3><p id="total-income">R0.00</p></div>
+    <div class="stamp expenses"><h3>Expenses</h3><p id="total-expenses">R0.00</p></div>
+    <div class="stamp balance"><h3>Balance</h3><p id="total-balance">R0.00</p></div>
+  </div>
+
+  <form id="budget-form">
+    <div class="form-title">New entry</div>
+    <div class="row">
+      <input type="text" id="desc" placeholder="Description — e.g. Salary, Rent, Groceries" required maxlength="60" />
+    </div>
+    <div class="row">
+      <select id="type">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+      </select>
+      <input type="number" id="amount" inputmode="decimal" placeholder="Amount" step="0.01" min="0.01" required />
+      <button type="submit" class="btn-add" id="add-btn">Add</button>
+    </div>
+  </form>
+
+  <div class="ledger">
+    <div class="ledger-head"><span>Date</span><span>Description</span><span>Amount</span><span></span></div>
+    <div class="ledger-body" id="item-list"></div>
+  </div>
+
+  <footer>Saved instantly on this device · syncs to your other devices once connected</footer>
+</div>
+
+<script type="module">
+  // ============================================================
+  // STEP 1 — Paste your Firebase config below.
+  // Get it from: Firebase Console > Project settings > General
+  // > Your apps > (Web app) > SDK setup and configuration.
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZeCi-5SRBzV3-QNj8hPBCh50LXDV5J0Q",
+    authDomain: "tac-fundi-personal-ledger.firebaseapp.com",
+    projectId: "tac-fundi-personal-ledger",
+    storageBucket: "tac-fundi-personal-ledger.firebasestorage.app",
+    messagingSenderId: "303313829234",
+    appId: "1:303313829234:web:031b1d32595f199d57b1eb"
+  };
+  const FIREBASE_CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+  const LOCAL_KEY = 'tacfundi_ledger_v1';
+  const CODE_KEY = 'tacfundi_sync_code';
+  let entries = [];
+  try { entries = JSON.parse(localStorage.getItem(LOCAL_KEY)) || []; } catch(e) { entries = []; }
+
+  const form = document.getElementById('budget-form');
+  const descInput = document.getElementById('desc');
+  const amountInput = document.getElementById('amount');
+  const typeInput = document.getElementById('type');
+  const itemList = document.getElementById('item-list');
+  const addBtn = document.getElementById('add-btn');
+  const syncDot = document.getElementById('sync-dot');
+  const syncStatus = document.getElementById('sync-status');
+  const syncInput = document.getElementById('sync-code-input');
+  const syncBtn = document.getElementById('sync-connect-btn');
+  const forgetBtn = document.getElementById('sync-forget-btn');
+
+  document.getElementById('today').textContent =
+    new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'short', year:'numeric' });
+
+  function fmt(n){ return 'R' + n.toLocaleString('en-ZA', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+
+  function saveLocal(){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(entries)); } catch(e) {} }
+
+  function render(){
+    itemList.innerHTML = '';
+    let income = 0, expenses = 0;
+
+    if (entries.length === 0){
+      itemList.innerHTML = '<div class="empty-state"><strong>No entries yet</strong>Add your first income or expense above.</div>';
+    }
+
+    // newest first
+    entries.slice().reverse().forEach((entry) => {
+      const val = parseFloat(entry.amount) || 0;
+      if (entry.type === 'income') income += val; else expenses += val;
+
+      const row = document.createElement('div');
+      row.className = 'entry';
+      row.innerHTML = `
+        <div class="date-cell">${entry.date || ''}</div>
+        <div class="desc" title="${entry.desc}">${entry.desc}</div>
+        <div class="amt ${entry.type === 'income' ? 'credit' : 'debit'}">${entry.type === 'income' ? '+' : '-'}${fmt(val)}</div>
+        <button class="void-btn" aria-label="Delete entry" data-id="${entry.id}">&times;</button>
+      `;
+      itemList.appendChild(row);
+    });
+
+    document.getElementById('total-income').textContent = fmt(income);
+    document.getElementById('total-expenses').textContent = fmt(expenses);
+    document.getElementById('total-balance').textContent = fmt(income - expenses);
+
+    saveLocal();
+  }
+
+  itemList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.void-btn');
+    if (!btn) return;
+    entries = entries.filter(en => String(en.id) !== btn.dataset.id);
+    render();
+    pushToCloud();
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    entries.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      desc: descInput.value.trim(),
+      amount: amountInput.value,
+      type: typeInput.value,
+      date: new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'short' }),
+      ts: Date.now()
+    });
+    descInput.value = '';
+    amountInput.value = '';
+    render();
+    pushToCloud();
+    descInput.focus();
+  });
+
+  render();
+
+  // ============================================================
+  // STEP 2 — Firebase sync (works offline, syncs when reconnected)
+  // ============================================================
+  let docRef = null, applyingRemote = false;
+  let setDocFn = null;
+  const syncCodeSaved = localStorage.getItem(CODE_KEY);
+
+  function setStatus(state, text){
+    syncDot.className = 'dot ' + state;
+    syncStatus.textContent = text;
+  }
+
+  function codeToId(code){ return code.trim().toLowerCase().replace(/\s+/g, '-'); }
+
+  async function pushToCloud(){
+    if (!docRef || applyingRemote || !setDocFn) return;
+    try {
+      await setDocFn(docRef, { entries, updatedAt: Date.now() });
+      setStatus(navigator.onLine ? 'on' : 'pending', navigator.onLine ? 'Synced' : 'Saved locally — will sync when back online');
+    } catch (err) {
+      setStatus('pending', 'Saved locally — will sync when back online');
+    }
+  }
+
+  async function connectSync(code){
+    if (!FIREBASE_CONFIGURED){
+      setStatus('off', 'Sync isn\u2019t set up yet — add your Firebase config in the file first');
+      return;
+    }
+    try {
+      setStatus('pending', 'Connecting…');
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
+      const { getAuth, signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
+      const { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, onSnapshot } =
+        await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      // persistentLocalCache = full offline support: reads/writes work with no
+      // connection, then Firestore auto-syncs the queue once you're back online.
+      const db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+      setDocFn = setDoc;
+
+      await signInAnonymously(auth);
+
+      docRef = doc(db, 'ledgers', codeToId(code));
+
+      onSnapshot(docRef, { includeMetadataChanges: true }, (snap) => {
+        const fromCache = snap.metadata.fromCache;
+        if (snap.exists()){
+          applyingRemote = true;
+          entries = snap.data().entries || [];
+          render();
+          applyingRemote = false;
+          setStatus(fromCache ? 'pending' : 'on', fromCache ? 'Offline — showing last synced copy' : 'Synced');
+        } else {
+          // first time this code is used anywhere — seed it with what's on this device
+          pushToCloud();
+        }
+      }, () => {
+        setStatus('pending', 'Offline — will sync when back online');
+      });
+
+      localStorage.setItem(CODE_KEY, code);
+      syncInput.style.display = 'none';
+      syncBtn.style.display = 'none';
+      forgetBtn.style.display = 'inline-block';
+    } catch (err) {
+      console.error(err);
+      setStatus('off', 'Could not connect — check your Firebase config and internet connection');
+    }
+  }
+
+  syncBtn.addEventListener('click', () => {
+    if (syncInput.style.display === 'none' || !syncInput.style.display){
+      syncInput.style.display = 'inline-block';
+      syncInput.focus();
+      return;
+    }
+    const code = syncInput.value.trim();
+    if (code) connectSync(code);
+  });
+
+  syncInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter'){ e.preventDefault(); syncBtn.click(); }
+  });
+
+  forgetBtn.addEventListener('click', () => {
+    localStorage.removeItem(CODE_KEY);
+    location.reload();
+  });
+
+  window.addEventListener('online', () => { if (docRef) setStatus('on', 'Back online — syncing'); pushToCloud(); });
+  window.addEventListener('offline', () => { if (docRef) setStatus('pending', 'Offline — changes are saved locally'); });
+
+  if (syncCodeSaved){
+    syncInput.value = syncCodeSaved;
+    connectSync(syncCodeSaved);
+  }
+</script>
+</body>
+</html>
