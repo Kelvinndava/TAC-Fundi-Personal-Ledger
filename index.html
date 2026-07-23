@@ -320,7 +320,8 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
       forgetBtn.style.display = 'inline-block';
     } catch (err) {
       console.error(err);
-      setStatus('off', 'Could not connect — check your Firebase config and internet connection');
+      const code = err && err.code ? err.code : (err && err.message ? err.message : 'unknown error');
+      setStatus('off', 'Could not connect: ' + code);
     }
   }
 
