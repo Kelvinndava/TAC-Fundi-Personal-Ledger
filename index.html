@@ -27,12 +27,16 @@ body{
   color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;
   display:flex;justify-content:center;padding:24px 14px calc(64px + env(safe-area-inset-bottom));
 }
-.sheet{width:100%;max-width:680px;}
+.sheet{width:100%;max-width:1080px;}
 header{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px double var(--ink);padding-bottom:12px;margin-bottom:16px;}
 header .brand{font-weight:800;font-size:1.7rem;letter-spacing:-0.02em;}
 header .brand em{font-style:normal;color:var(--gold);}
 header .tagline{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);}
 header .date{font-size:0.72rem;color:var(--ink-soft);text-align:right;}
+
+/* ---------- two-column layout: ledger left, calendar always on the side ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;}
+.main{min-width:0;}
 
 .sync-bar{
   display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--card);
@@ -73,6 +77,15 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--teal);outl
 .btn-add{flex:0 0 auto;background:var(--ink);color:var(--paper);border:none;font-weight:700;cursor:pointer;padding:12px 22px;}
 .btn-add:hover{background:var(--teal);}
 .btn-add:disabled{opacity:0.6;}
+#entry-date{flex:0 0 auto;width:100%;}
+
+.filter-bar{
+  display:none;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
+  background:var(--gold-bg);border:1px solid var(--paper-line);border-radius:10px;padding:8px 12px;font-size:0.82rem;
+}
+.filter-bar.show{display:flex;}
+.filter-bar button{min-height:36px;padding:6px 12px;font-size:0.8rem;font-weight:600;background:var(--ink);color:var(--paper);border:none;cursor:pointer;}
+.filter-bar button:hover{background:var(--teal);}
 
 .ledger{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
 .ledger-head{display:grid;grid-template-columns:1fr 1.5fr 1fr 32px;gap:6px;padding:10px 12px;background:var(--ink);color:var(--paper);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;}
@@ -94,17 +107,7 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--teal);outl
 
 footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft);letter-spacing:0.03em;}
 
-@media (max-width:480px){
-  .stamps{grid-template-columns:1fr 1fr;}
-  .stamps .stamp:nth-child(3){grid-column:1/3;}
-  .ledger-head,.entry{grid-template-columns:0.9fr 1.4fr 0.9fr 32px;}
-  .row{flex-wrap:wrap;}
-  select{flex:1 1 100%;}
-  .sync-bar{font-size:0.78rem;}
-}
-  .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;}
-.main{min-width:0;}
-
+/* ---------- calendar side panel ---------- */
 .cal-panel{
   position:sticky;top:16px;background:var(--card);border:1px solid var(--paper-line);
   border-radius:10px;box-shadow:var(--shadow);overflow:hidden;
@@ -142,18 +145,27 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 .cal-legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:0.68rem;color:var(--ink-soft);}
 .cal-legend span{display:inline-flex;align-items:center;gap:5px;}
 .cal-legend i{width:7px;height:7px;border-radius:50%;display:inline-block;}
-.cal-summary{margin-top:12px;padding:10px 12px;border-top:1px dashed var(--paper-line);font-size:0.82rem;color:var(--ink-soft);}
+.cal-summary{
+  margin-top:12px;padding:10px 12px;border-top:1px dashed var(--paper-line);font-size:0.82rem;color:var(--ink-soft);
+}
 .cal-summary strong{color:var(--ink);display:block;margin-bottom:3px;}
 .cal-summary .inc{color:var(--gold);font-weight:700;}
 .cal-summary .exp{color:var(--brick);font-weight:700;}
 
-/* phones: calendar moves above the content and collapses */
 @media (max-width:899px){
   .layout{grid-template-columns:1fr;gap:16px;}
   .cal-panel{position:static;order:-1;}
   .cal-toggle{display:block;}
   .cal-body{display:none;}
   .cal-panel.open .cal-body{display:block;}
+}
+@media (max-width:480px){
+  .stamps{grid-template-columns:1fr 1fr;}
+  .stamps .stamp:nth-child(3){grid-column:1/3;}
+  .ledger-head,.entry{grid-template-columns:0.9fr 1.4fr 0.9fr 32px;}
+  .row{flex-wrap:wrap;}
+  select{flex:1 1 100%;}
+  .sync-bar{font-size:0.78rem;}
 }
 </style>
 </head>
@@ -166,71 +178,80 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
     </div>
     <div class="date" id="today"></div>
   </header>
-<div class="layout">
-  <div class="main">
-    <!-- your existing app content goes here -->
-  </div>
 
-  <aside class="cal-panel" id="cal-panel" aria-label="Calendar">
-    <div class="clock">
-      <div class="time" id="clock-time">--:--:--</div>
-      <div class="longdate" id="clock-date"></div>
-      <button type="button" class="cal-toggle" id="cal-toggle" aria-expanded="false">Show calendar</button>
-    </div>
-    <div class="cal-body">
-      <div class="cal-nav">
-        <button type="button" id="cal-prev" aria-label="Previous month">&lsaquo;</button>
-        <div class="month" id="cal-title"></div>
-        <button type="button" id="cal-next" aria-label="Next month">&rsaquo;</button>
-        <button type="button" class="today-btn" id="cal-today">Today</button>
+  <div class="layout">
+    <div class="main">
+      <div class="sync-bar" id="sync-bar">
+        <span class="dot off" id="sync-dot"></span>
+        <span class="status-text" id="sync-status">Not connected — saving to this device only</span>
+        <input type="text" id="sync-code-input" placeholder="Your sync code (any word/phrase)" style="display:none" autocomplete="off" />
+        <button id="sync-connect-btn" type="button">Connect sync</button>
+        <button class="link-btn" id="sync-forget-btn" type="button" style="display:none">Disconnect</button>
       </div>
-      <div class="cal-weekdays">
-        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+
+      <div class="stamps">
+        <div class="stamp income"><h3>Income</h3><p id="total-income">R0.00</p></div>
+        <div class="stamp expenses"><h3>Expenses</h3><p id="total-expenses">R0.00</p></div>
+        <div class="stamp balance"><h3>Balance</h3><p id="total-balance">R0.00</p></div>
       </div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div class="cal-legend">
-        <span><i style="background:var(--gold)"></i>Income</span>
-        <span><i style="background:var(--brick)"></i>Expense</span>
+
+      <form id="budget-form">
+        <div class="form-title">New entry</div>
+        <div class="row">
+          <input type="text" id="desc" placeholder="Description — e.g. Salary, Rent, Groceries" required maxlength="60" />
+        </div>
+        <div class="row">
+          <select id="type">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+          <input type="number" id="amount" inputmode="decimal" placeholder="Amount" step="0.01" min="0.01" required />
+          <button type="submit" class="btn-add" id="add-btn">Add</button>
+        </div>
+        <div class="row">
+          <input type="date" id="entry-date" aria-label="Entry date" />
+        </div>
+      </form>
+
+      <div class="filter-bar" id="filter-bar">
+        <span id="filter-label"></span>
+        <button type="button" id="filter-clear">Show all</button>
       </div>
-      <div class="cal-summary" id="cal-summary"></div>
+
+      <div class="ledger">
+        <div class="ledger-head"><span>Date</span><span>Description</span><span>Amount</span><span></span></div>
+        <div class="ledger-body" id="item-list"></div>
+      </div>
+
+      <footer>Saved instantly on this device · syncs to your other devices once connected</footer>
     </div>
-  </aside>
-</div>
-  <div class="sync-bar" id="sync-bar">
-    <span class="dot off" id="sync-dot"></span>
-    <span class="status-text" id="sync-status">Not connected — saving to this device only</span>
-    <input type="text" id="sync-code-input" placeholder="Your sync code (any word/phrase)" style="display:none" autocomplete="off" />
-    <button id="sync-connect-btn" type="button">Connect sync</button>
-    <button class="link-btn" id="sync-forget-btn" type="button" style="display:none">Disconnect</button>
+
+    <!-- Calendar: always visible on the side (collapsible on phones) -->
+    <aside class="cal-panel" id="cal-panel" aria-label="Calendar">
+      <div class="clock">
+        <div class="time" id="clock-time">--:--:--</div>
+        <div class="longdate" id="clock-date"></div>
+        <button type="button" class="cal-toggle" id="cal-toggle" aria-expanded="false">Show calendar</button>
+      </div>
+      <div class="cal-body">
+        <div class="cal-nav">
+          <button type="button" id="cal-prev" aria-label="Previous month">&lsaquo;</button>
+          <div class="month" id="cal-title"></div>
+          <button type="button" id="cal-next" aria-label="Next month">&rsaquo;</button>
+          <button type="button" class="today-btn" id="cal-today">Today</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-legend">
+          <span><i style="background:var(--gold)"></i>Income</span>
+          <span><i style="background:var(--brick)"></i>Expense</span>
+        </div>
+        <div class="cal-summary" id="cal-summary"></div>
+      </div>
+    </aside>
   </div>
-
-  <div class="stamps">
-    <div class="stamp income"><h3>Income</h3><p id="total-income">R0.00</p></div>
-    <div class="stamp expenses"><h3>Expenses</h3><p id="total-expenses">R0.00</p></div>
-    <div class="stamp balance"><h3>Balance</h3><p id="total-balance">R0.00</p></div>
-  </div>
-
-  <form id="budget-form">
-    <div class="form-title">New entry</div>
-    <div class="row">
-      <input type="text" id="desc" placeholder="Description — e.g. Salary, Rent, Groceries" required maxlength="60" />
-    </div>
-    <div class="row">
-      <select id="type">
-        <option value="expense">Expense</option>
-        <option value="income">Income</option>
-      </select>
-      <input type="number" id="amount" inputmode="decimal" placeholder="Amount" step="0.01" min="0.01" required />
-      <button type="submit" class="btn-add" id="add-btn">Add</button>
-    </div>
-  </form>
-
-  <div class="ledger">
-    <div class="ledger-head"><span>Date</span><span>Description</span><span>Amount</span><span></span></div>
-    <div class="ledger-body" id="item-list"></div>
-  </div>
-
-  <footer>Saved instantly on this device · syncs to your other devices once connected</footer>
 </div>
 
 <script type="module">
@@ -258,6 +279,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
   const descInput = document.getElementById('desc');
   const amountInput = document.getElementById('amount');
   const typeInput = document.getElementById('type');
+  const dateInput = document.getElementById('entry-date');
   const itemList = document.getElementById('item-list');
   const addBtn = document.getElementById('add-btn');
   const syncDot = document.getElementById('sync-dot');
@@ -265,34 +287,182 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
   const syncInput = document.getElementById('sync-code-input');
   const syncBtn = document.getElementById('sync-connect-btn');
   const forgetBtn = document.getElementById('sync-forget-btn');
-
-  document.getElementById('today').textContent =
-    new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'short', year:'numeric' });
+  const filterBar = document.getElementById('filter-bar');
+  const filterLabel = document.getElementById('filter-label');
 
   function fmt(n){ return 'R' + n.toLocaleString('en-ZA', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
-
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function saveLocal(){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(entries)); } catch(e) {} }
 
+  // ============================================================
+  // Calendar + live clock
+  // ============================================================
+  const pad = n => String(n).padStart(2, '0');
+  const keyOf = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const todayKey = () => keyOf(new Date());
+  function dateFromKey(k){ const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+  function entryKey(e){
+    const t = Number(e.ts) || parseInt(e.id, 10);
+    return Number.isFinite(t) ? keyOf(new Date(t)) : null;
+  }
+  function labelFor(d){
+    const opts = { day:'2-digit', month:'short' };
+    if (d.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+    return d.toLocaleDateString('en-ZA', opts);
+  }
+
+  const now0 = new Date();
+  let viewY = now0.getFullYear(), viewM = now0.getMonth();
+  let selected = null;           // 'YYYY-MM-DD' or null
+  let lastToday = todayKey();
+
+  const calGrid = document.getElementById('cal-grid');
+  const calTitle = document.getElementById('cal-title');
+  const calSummary = document.getElementById('cal-summary');
+  const clockTime = document.getElementById('clock-time');
+  const clockDate = document.getElementById('clock-date');
+  const todayEl = document.getElementById('today');
+  const calPanel = document.getElementById('cal-panel');
+  const calToggle = document.getElementById('cal-toggle');
+
+  function renderHeaderDate(){
+    todayEl.textContent = new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'short', year:'numeric' });
+    clockDate.textContent = new Date().toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  function tick(){
+    const n = new Date();
+    clockTime.textContent = pad(n.getHours()) + ':' + pad(n.getMinutes()) + ':' + pad(n.getSeconds());
+    const tk = keyOf(n);
+    if (tk !== lastToday){          // midnight rolled over
+      lastToday = tk;
+      renderHeaderDate();
+      if (!selected) dateInput.value = tk;
+      renderCalendar();
+    }
+  }
+
+  function dayTotals(){
+    const map = {};
+    entries.forEach(e => {
+      const k = entryKey(e); if (!k) return;
+      const v = parseFloat(e.amount) || 0;
+      const o = map[k] || (map[k] = { inc:0, exp:0, n:0 });
+      if (e.type === 'income') o.inc += v; else o.exp += v;
+      o.n++;
+    });
+    return map;
+  }
+
+  function renderCalendar(){
+    const totals = dayTotals();
+    const first = new Date(viewY, viewM, 1);
+    const offset = (first.getDay() + 6) % 7;     // Monday-first
+    const tk = todayKey();
+    calTitle.textContent = first.toLocaleDateString('en-ZA', { month:'long', year:'numeric' });
+
+    let html = '';
+    for (let i = 0; i < 42; i++){
+      const d = new Date(viewY, viewM, 1 - offset + i);
+      const k = keyOf(d);
+      const t = totals[k];
+      const cls = ['cal-day'];
+      if (d.getMonth() !== viewM) cls.push('other');
+      if (k === tk) cls.push('today');
+      if (k === selected) cls.push('selected');
+      const dots = t ? '<span class="dots">' + (t.inc ? '<i class="inc"></i>' : '') + (t.exp ? '<i class="exp"></i>' : '') + '</span>' : '<span class="dots"></span>';
+      const aria = d.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + (t ? ', ' + t.n + (t.n === 1 ? ' entry' : ' entries') : '');
+      html += '<button type="button" class="' + cls.join(' ') + '" data-key="' + k + '" aria-label="' + aria + '" aria-pressed="' + (k === selected) + '">' + d.getDate() + dots + '</button>';
+    }
+    calGrid.innerHTML = html;
+
+    // summary under the calendar: selected day, otherwise the month shown
+    const prefix = viewY + '-' + pad(viewM + 1) + '-';
+    if (selected){
+      const t = totals[selected] || { inc:0, exp:0, n:0 };
+      calSummary.innerHTML = '<strong>' + esc(dateFromKey(selected).toLocaleDateString('en-ZA', { weekday:'short', day:'numeric', month:'short' })) + ' · ' +
+        t.n + (t.n === 1 ? ' entry' : ' entries') + '</strong>' +
+        '<span class="inc">+' + fmt(t.inc) + '</span> &nbsp; <span class="exp">-' + fmt(t.exp) + '</span>';
+    } else {
+      let inc = 0, exp = 0, n = 0;
+      Object.keys(totals).forEach(k => { if (k.startsWith(prefix)){ inc += totals[k].inc; exp += totals[k].exp; n += totals[k].n; } });
+      calSummary.innerHTML = '<strong>' + esc(first.toLocaleDateString('en-ZA', { month:'long' })) + ' · ' + n + (n === 1 ? ' entry' : ' entries') + '</strong>' +
+        '<span class="inc">+' + fmt(inc) + '</span> &nbsp; <span class="exp">-' + fmt(exp) + '</span>';
+    }
+  }
+
+  function setSelected(key){
+    selected = key;
+    if (key){
+      const d = dateFromKey(key);
+      viewY = d.getFullYear(); viewM = d.getMonth();
+    }
+    dateInput.value = key || todayKey();
+    render();
+  }
+
+  function shiftMonth(delta){
+    const d = new Date(viewY, viewM + delta, 1);
+    viewY = d.getFullYear(); viewM = d.getMonth();
+    renderCalendar();
+  }
+
+  calGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cal-day');
+    if (!btn) return;
+    const k = btn.dataset.key;
+    setSelected(k === selected ? null : k);   // click again to clear
+  });
+  document.getElementById('cal-prev').addEventListener('click', () => shiftMonth(-1));
+  document.getElementById('cal-next').addEventListener('click', () => shiftMonth(1));
+  document.getElementById('cal-today').addEventListener('click', () => {
+    const n = new Date(); viewY = n.getFullYear(); viewM = n.getMonth();
+    setSelected(todayKey());
+  });
+  document.getElementById('filter-clear').addEventListener('click', () => setSelected(null));
+  dateInput.addEventListener('change', () => { if (dateInput.value) setSelected(dateInput.value); });
+  calToggle.addEventListener('click', () => {
+    const open = calPanel.classList.toggle('open');
+    calToggle.textContent = open ? 'Hide calendar' : 'Show calendar';
+    calToggle.setAttribute('aria-expanded', open);
+  });
+
+  // ============================================================
+  // Ledger
+  // ============================================================
   function render(){
     itemList.innerHTML = '';
     let income = 0, expenses = 0;
+    entries.forEach(en => {
+      const v = parseFloat(en.amount) || 0;
+      if (en.type === 'income') income += v; else expenses += v;
+    });
 
-    if (entries.length === 0){
-      itemList.innerHTML = '<div class="empty-state"><strong>No entries yet</strong>Add your first income or expense above.</div>';
+    const visible = (selected ? entries.filter(en => entryKey(en) === selected) : entries.slice())
+      .sort((a, b) => (Number(b.ts) || parseInt(b.id, 10) || 0) - (Number(a.ts) || parseInt(a.id, 10) || 0));
+
+    if (selected){
+      filterBar.classList.add('show');
+      filterLabel.textContent = 'Showing ' + dateFromKey(selected).toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long' });
+    } else {
+      filterBar.classList.remove('show');
     }
 
-    // newest first
-    entries.slice().reverse().forEach((entry) => {
-      const val = parseFloat(entry.amount) || 0;
-      if (entry.type === 'income') income += val; else expenses += val;
+    if (visible.length === 0){
+      itemList.innerHTML = selected
+        ? '<div class="empty-state"><strong>Nothing on this day</strong>Add an entry above and it will land on this date.</div>'
+        : '<div class="empty-state"><strong>No entries yet</strong>Add your first income or expense above.</div>';
+    }
 
+    visible.forEach((entry) => {
+      const val = parseFloat(entry.amount) || 0;
       const row = document.createElement('div');
       row.className = 'entry';
       row.innerHTML = `
-        <div class="date-cell">${entry.date || ''}</div>
-        <div class="desc" title="${entry.desc}">${entry.desc}</div>
+        <div class="date-cell">${esc(entry.date || '')}</div>
+        <div class="desc" title="${esc(entry.desc)}">${esc(entry.desc)}</div>
         <div class="amt ${entry.type === 'income' ? 'credit' : 'debit'}">${entry.type === 'income' ? '+' : '-'}${fmt(val)}</div>
-        <button class="void-btn" aria-label="Delete entry" data-id="${entry.id}">&times;</button>
+        <button class="void-btn" aria-label="Delete entry" data-id="${esc(entry.id)}">&times;</button>
       `;
       itemList.appendChild(row);
     });
@@ -301,6 +471,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
     document.getElementById('total-expenses').textContent = fmt(expenses);
     document.getElementById('total-balance').textContent = fmt(income - expenses);
 
+    renderCalendar();
     saveLocal();
   }
 
@@ -314,21 +485,30 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    const dkey = dateInput.value || todayKey();
+    const [y, m, d] = dkey.split('-').map(Number);
+    const n = new Date();
+    const when = new Date(y, m - 1, d, n.getHours(), n.getMinutes(), n.getSeconds());
     entries.push({
       id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
       desc: descInput.value.trim(),
       amount: amountInput.value,
       type: typeInput.value,
-      date: new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'short' }),
-      ts: Date.now()
+      date: labelFor(when),
+      ts: when.getTime()
     });
     descInput.value = '';
     amountInput.value = '';
+    dateInput.value = selected || todayKey();
     render();
     pushToCloud();
     descInput.focus();
   });
 
+  dateInput.value = todayKey();
+  renderHeaderDate();
+  tick();
+  setInterval(tick, 1000);
   render();
 
   // ============================================================
@@ -433,145 +613,6 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
     syncInput.value = syncCodeSaved;
     connectSync(syncCodeSaved);
   }
-  // ---- helpers ----
-const pad = n => String(n).padStart(2, '0');
-const keyOf = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-const todayKey = () => keyOf(new Date());
-function dateFromKey(k){ const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
-function fmt(n){ return 'R' + n.toLocaleString('en-ZA', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
-function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function entryKey(e){
-  const t = Number(e.ts) || parseInt(e.id, 10);
-  return Number.isFinite(t) ? keyOf(new Date(t)) : null;
-}
-
-// ---- state ----
-const now0 = new Date();
-let viewY = now0.getFullYear(), viewM = now0.getMonth();
-let selected = null;               // 'YYYY-MM-DD' or null
-let lastToday = todayKey();
-
-const calGrid = document.getElementById('cal-grid');
-const calTitle = document.getElementById('cal-title');
-const calSummary = document.getElementById('cal-summary');
-const clockTime = document.getElementById('clock-time');
-const clockDate = document.getElementById('clock-date');
-const calPanel = document.getElementById('cal-panel');
-const calToggle = document.getElementById('cal-toggle');
-
-// ---- live clock (also detects midnight) ----
-function renderHeaderDate(){
-  clockDate.textContent = new Date().toLocaleDateString('en-ZA',
-    { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-}
-function tick(){
-  const n = new Date();
-  clockTime.textContent = pad(n.getHours()) + ':' + pad(n.getMinutes()) + ':' + pad(n.getSeconds());
-  const tk = keyOf(n);
-  if (tk !== lastToday){
-    lastToday = tk;
-    renderHeaderDate();
-    renderCalendar();
-  }
-}
-
-// ---- per-day totals, built from your `entries` array ----
-function dayTotals(){
-  const map = {};
-  entries.forEach(e => {
-    const k = entryKey(e); if (!k) return;
-    const v = parseFloat(e.amount) || 0;
-    const o = map[k] || (map[k] = { inc:0, exp:0, n:0 });
-    if (e.type === 'income') o.inc += v; else o.exp += v;
-    o.n++;
-  });
-  return map;
-}
-
-// ---- draw the month ----
-function renderCalendar(){
-  const totals = dayTotals();
-  const first = new Date(viewY, viewM, 1);
-  const offset = (first.getDay() + 6) % 7;        // Monday-first
-  const tk = todayKey();
-  calTitle.textContent = first.toLocaleDateString('en-ZA', { month:'long', year:'numeric' });
-
-  let html = '';
-  for (let i = 0; i < 42; i++){
-    const d = new Date(viewY, viewM, 1 - offset + i);
-    const k = keyOf(d);
-    const t = totals[k];
-    const cls = ['cal-day'];
-    if (d.getMonth() !== viewM) cls.push('other');
-    if (k === tk) cls.push('today');
-    if (k === selected) cls.push('selected');
-    const dots = t
-      ? '<span class="dots">' + (t.inc ? '<i class="inc"></i>' : '') + (t.exp ? '<i class="exp"></i>' : '') + '</span>'
-      : '<span class="dots"></span>';
-    const aria = d.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-      + (t ? ', ' + t.n + (t.n === 1 ? ' entry' : ' entries') : '');
-    html += '<button type="button" class="' + cls.join(' ') + '" data-key="' + k +
-            '" aria-label="' + aria + '" aria-pressed="' + (k === selected) + '">' + d.getDate() + dots + '</button>';
-  }
-  calGrid.innerHTML = html;
-
-  // summary: selected day, otherwise the month being viewed
-  const prefix = viewY + '-' + pad(viewM + 1) + '-';
-  if (selected){
-    const t = totals[selected] || { inc:0, exp:0, n:0 };
-    calSummary.innerHTML = '<strong>' +
-      esc(dateFromKey(selected).toLocaleDateString('en-ZA', { weekday:'short', day:'numeric', month:'short' })) +
-      ' · ' + t.n + (t.n === 1 ? ' entry' : ' entries') + '</strong>' +
-      '<span class="inc">+' + fmt(t.inc) + '</span> &nbsp; <span class="exp">-' + fmt(t.exp) + '</span>';
-  } else {
-    let inc = 0, exp = 0, n = 0;
-    Object.keys(totals).forEach(k => {
-      if (k.startsWith(prefix)){ inc += totals[k].inc; exp += totals[k].exp; n += totals[k].n; }
-    });
-    calSummary.innerHTML = '<strong>' + esc(first.toLocaleDateString('en-ZA', { month:'long' })) +
-      ' · ' + n + (n === 1 ? ' entry' : ' entries') + '</strong>' +
-      '<span class="inc">+' + fmt(inc) + '</span> &nbsp; <span class="exp">-' + fmt(exp) + '</span>';
-  }
-}
-
-// ---- interaction ----
-function setSelected(key){
-  selected = key;
-  if (key){
-    const d = dateFromKey(key);
-    viewY = d.getFullYear(); viewM = d.getMonth();
-  }
-  render();   // your main render(); it should call renderCalendar() and filter by `selected`
-}
-function shiftMonth(delta){
-  const d = new Date(viewY, viewM + delta, 1);
-  viewY = d.getFullYear(); viewM = d.getMonth();
-  renderCalendar();
-}
-
-calGrid.addEventListener('click', (e) => {
-  const btn = e.target.closest('.cal-day');
-  if (!btn) return;
-  const k = btn.dataset.key;
-  setSelected(k === selected ? null : k);     // click again to clear
-});
-document.getElementById('cal-prev').addEventListener('click', () => shiftMonth(-1));
-document.getElementById('cal-next').addEventListener('click', () => shiftMonth(1));
-document.getElementById('cal-today').addEventListener('click', () => {
-  const n = new Date(); viewY = n.getFullYear(); viewM = n.getMonth();
-  setSelected(todayKey());
-});
-calToggle.addEventListener('click', () => {
-  const open = calPanel.classList.toggle('open');
-  calToggle.textContent = open ? 'Hide calendar' : 'Show calendar';
-  calToggle.setAttribute('aria-expanded', open);
-});
-
-// ---- start ----
-renderHeaderDate();
-tick();
-setInterval(tick, 1000);
-renderCalendar();
 </script>
 </body>
 </html>
