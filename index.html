@@ -66,6 +66,21 @@ header .date{font-size:0.72rem;color:var(--ink-soft);text-align:right;}
 .stamp h3{font-weight:700;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.85;margin-bottom:5px;}
 .stamp p{font-weight:800;font-size:1.05rem;color:var(--ink);word-break:break-word;}
 
+/* ---------- spending vs income bar ---------- */
+.ratio{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:14px 16px;margin:-8px 0 24px;box-shadow:var(--shadow);}
+.ratio-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;}
+.ratio-title{font-weight:700;font-size:0.8rem;letter-spacing:0.04em;color:var(--ink-soft);text-transform:uppercase;}
+.ratio-pct{font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--teal);}
+.ratio-track{height:16px;border-radius:999px;background:var(--paper-line);overflow:hidden;position:relative;}
+.ratio-fill{height:100%;width:0;border-radius:999px;background:var(--teal);transition:width .5s ease,background .3s ease;}
+.ratio.warn .ratio-fill{background:var(--gold);}
+.ratio.warn .ratio-pct{color:var(--gold);}
+.ratio.over .ratio-fill{background:var(--brick);}
+.ratio.over .ratio-pct{color:var(--brick);}
+.ratio-legend{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:0.74rem;color:var(--ink-soft);}
+.ratio-legend b{color:var(--ink);}
+#ratio-note{text-align:right;}
+
 form{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:16px;box-shadow:var(--shadow);margin-bottom:24px;}
 .form-title{font-weight:700;font-size:0.8rem;letter-spacing:0.04em;margin-bottom:10px;color:var(--ink-soft);text-transform:uppercase;}
 .row{display:flex;gap:10px;margin-bottom:10px;}
@@ -106,6 +121,31 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--teal);outl
 .empty-state strong{display:block;font-weight:700;color:var(--ink);margin-bottom:4px;}
 
 footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft);letter-spacing:0.03em;}
+
+/* ---------- notes & plans ---------- */
+.notes{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden;}
+.notes-head{background:var(--ink);color:var(--paper);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;}
+.notes-head .plan-sum{text-transform:none;letter-spacing:0;font-size:0.74rem;opacity:0.92;}
+.notes form.note-form{background:none;border:none;border-bottom:1px solid var(--paper-line);border-radius:0;box-shadow:none;margin:0;padding:14px;}
+.note-form .row .grow{flex:1;}
+#note-date{flex:1;}
+.note-list{max-height:360px;overflow-y:auto;}
+.note{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--paper-line);font-size:0.85rem;}
+.note:last-child{border-bottom:none;}
+.note.done .note-text{text-decoration:line-through;opacity:0.5;}
+.note.done .note-meta{opacity:0.5;}
+input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-color:var(--teal);cursor:pointer;}
+.note-text{font-weight:500;word-break:break-word;}
+.note-meta{font-size:0.7rem;color:var(--ink-soft);margin-top:3px;}
+.note-meta .tag{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:700;font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;background:var(--paper-line);color:var(--ink);}
+.note-meta .tag.income{background:var(--gold-bg);color:var(--gold);}
+.note-meta .tag.expense{background:var(--brick-bg);color:var(--brick);}
+.note-meta .overdue{color:var(--brick);font-weight:700;}
+.note-actions{display:flex;align-items:center;gap:4px;}
+.note-log{min-height:34px;padding:4px 10px;font-size:0.72rem;font-weight:700;background:var(--ink);color:var(--paper);border:none;cursor:pointer;}
+.note-log:hover{background:var(--teal);}
+.cal-day .dots i.note{background:var(--ink-soft);}
+.cal-day.selected .dots i.note{background:#c9d2e6;}
 
 /* ---------- calendar side panel ---------- */
 .cal-panel{
@@ -195,6 +235,20 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
         <div class="stamp balance"><h3>Balance</h3><p id="total-balance">R0.00</p></div>
       </div>
 
+      <div class="ratio" id="ratio" role="group" aria-label="Spending versus income">
+        <div class="ratio-top">
+          <span class="ratio-title">Spent vs income</span>
+          <span class="ratio-pct" id="ratio-pct">0%</span>
+        </div>
+        <div class="ratio-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ratio-track">
+          <div class="ratio-fill" id="ratio-fill"></div>
+        </div>
+        <div class="ratio-legend">
+          <span id="ratio-spent">Spent <b>R0.00</b> of <b>R0.00</b></span>
+          <span id="ratio-note">Add income to get started</span>
+        </div>
+      </div>
+
       <form id="budget-form">
         <div class="form-title">New entry</div>
         <div class="row">
@@ -223,6 +277,31 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
         <div class="ledger-body" id="item-list"></div>
       </div>
 
+      <section class="notes" id="notes" aria-label="Notes and plans">
+        <div class="notes-head">
+          <span>Notes &amp; plans</span>
+          <span class="plan-sum" id="plan-sum"></span>
+        </div>
+        <form class="note-form" id="note-form">
+          <div class="row">
+            <input type="text" id="note-text" placeholder="e.g. Car service, Salary on the 28th, call the bank" required maxlength="120" />
+          </div>
+          <div class="row">
+            <select id="note-kind" aria-label="Type">
+              <option value="note">Note</option>
+              <option value="expense">Planned expense</option>
+              <option value="income">Planned income</option>
+            </select>
+            <input type="number" id="note-amount" inputmode="decimal" placeholder="Amount (optional)" step="0.01" min="0.01" disabled />
+          </div>
+          <div class="row">
+            <input type="date" id="note-date" aria-label="Date (optional)" />
+            <button type="submit" class="btn-add">Add note</button>
+          </div>
+        </form>
+        <div class="note-list" id="note-list"></div>
+      </section>
+
       <footer>Saved instantly on this device · syncs to your other devices once connected</footer>
     </div>
 
@@ -247,6 +326,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
         <div class="cal-legend">
           <span><i style="background:var(--gold)"></i>Income</span>
           <span><i style="background:var(--brick)"></i>Expense</span>
+          <span><i style="background:var(--ink-soft)"></i>Note</span>
         </div>
         <div class="cal-summary" id="cal-summary"></div>
       </div>
@@ -274,6 +354,11 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
   const CODE_KEY = 'tacfundi_sync_code';
   let entries = [];
   try { entries = JSON.parse(localStorage.getItem(LOCAL_KEY)) || []; } catch(e) { entries = []; }
+
+  const NOTES_KEY = 'tacfundi_notes_v1';
+  let notes = [];
+  try { notes = JSON.parse(localStorage.getItem(NOTES_KEY)) || []; } catch(e) { notes = []; }
+  function saveNotes(){ try { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); } catch(e) {} }
 
   const form = document.getElementById('budget-form');
   const descInput = document.getElementById('desc');
@@ -356,6 +441,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 
   function renderCalendar(){
     const totals = dayTotals();
+    const noteDays = new Set(notes.filter(n => !n.done && n.date).map(n => n.date));
     const first = new Date(viewY, viewM, 1);
     const offset = (first.getDay() + 6) % 7;     // Monday-first
     const tk = todayKey();
@@ -370,7 +456,10 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
       if (d.getMonth() !== viewM) cls.push('other');
       if (k === tk) cls.push('today');
       if (k === selected) cls.push('selected');
-      const dots = t ? '<span class="dots">' + (t.inc ? '<i class="inc"></i>' : '') + (t.exp ? '<i class="exp"></i>' : '') + '</span>' : '<span class="dots"></span>';
+      const hasNote = noteDays.has(k);
+      const dots = (t || hasNote)
+        ? '<span class="dots">' + (t && t.inc ? '<i class="inc"></i>' : '') + (t && t.exp ? '<i class="exp"></i>' : '') + (hasNote ? '<i class="note"></i>' : '') + '</span>'
+        : '<span class="dots"></span>';
       const aria = d.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + (t ? ', ' + t.n + (t.n === 1 ? ' entry' : ' entries') : '');
       html += '<button type="button" class="' + cls.join(' ') + '" data-key="' + k + '" aria-label="' + aria + '" aria-pressed="' + (k === selected) + '">' + d.getDate() + dots + '</button>';
     }
@@ -398,6 +487,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
       viewY = d.getFullYear(); viewM = d.getMonth();
     }
     dateInput.value = key || todayKey();
+    noteDateInput.value = key || '';
     render();
   }
 
@@ -471,8 +561,42 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
     document.getElementById('total-expenses').textContent = fmt(expenses);
     document.getElementById('total-balance').textContent = fmt(income - expenses);
 
+    renderRatio(income, expenses);
     renderCalendar();
     saveLocal();
+  }
+
+  // Spent-vs-income bar: green under 75%, gold 75-100%, red when spending exceeds income
+  function renderRatio(income, expenses){
+    const box = document.getElementById('ratio');
+    const fill = document.getElementById('ratio-fill');
+    const pctEl = document.getElementById('ratio-pct');
+    const note = document.getElementById('ratio-note');
+    const track = document.getElementById('ratio-track');
+    document.getElementById('ratio-spent').innerHTML = 'Spent <b>' + fmt(expenses) + '</b> of <b>' + fmt(income) + '</b>';
+    box.classList.remove('warn', 'over');
+
+    if (income <= 0){
+      const has = expenses > 0;
+      fill.style.width = has ? '100%' : '0%';
+      if (has) box.classList.add('over');
+      pctEl.textContent = has ? '—' : '0%';
+      note.textContent = has ? 'Spending with no income logged' : 'Add income to get started';
+      track.setAttribute('aria-valuenow', has ? 100 : 0);
+      return;
+    }
+
+    const pct = expenses / income * 100;
+    fill.style.width = Math.min(pct, 100) + '%';
+    pctEl.textContent = Math.round(pct) + '%';
+    track.setAttribute('aria-valuenow', Math.min(Math.round(pct), 100));
+    if (pct > 100){
+      box.classList.add('over');
+      note.textContent = 'Over by ' + fmt(expenses - income);
+    } else {
+      if (pct >= 75) box.classList.add('warn');
+      note.textContent = fmt(income - expenses) + ' left (' + Math.round(100 - pct) + '%)';
+    }
   }
 
   itemList.addEventListener('click', (e) => {
@@ -505,11 +629,131 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
     descInput.focus();
   });
 
+  // ============================================================
+  // Notes & plans (future spending / income / anything else)
+  // ============================================================
+  const noteForm = document.getElementById('note-form');
+  const noteText = document.getElementById('note-text');
+  const noteKind = document.getElementById('note-kind');
+  const noteAmount = document.getElementById('note-amount');
+  const noteDateInput = document.getElementById('note-date');
+  const noteList = document.getElementById('note-list');
+  const planSum = document.getElementById('plan-sum');
+  const KIND_LABEL = { note:'Note', expense:'Planned expense', income:'Planned income' };
+
+  function notesChanged(){
+    saveNotes();
+    renderNotes();
+    renderCalendar();
+    pushToCloud();
+  }
+
+  function renderNotes(){
+    const tk = todayKey();
+    const sorted = notes.slice().sort((a, b) => {
+      if (!!a.done !== !!b.done) return a.done ? 1 : -1;
+      const ad = a.date || '9999', bd = b.date || '9999';
+      if (ad !== bd) return ad < bd ? -1 : 1;
+      return (a.ts || 0) - (b.ts || 0);
+    });
+
+    // planned totals from open (not done) items
+    let pin = 0, pout = 0;
+    notes.forEach(n => {
+      if (n.done) return;
+      const v = parseFloat(n.amount) || 0;
+      if (n.kind === 'income') pin += v; else if (n.kind === 'expense') pout += v;
+    });
+    planSum.innerHTML = (pin || pout)
+      ? 'Planned: <b>+' + fmt(pin) + '</b> in · <b>-' + fmt(pout) + '</b> out · net <b>' + (pin - pout < 0 ? '-' : '') + fmt(Math.abs(pin - pout)) + '</b>'
+      : '';
+
+    if (sorted.length === 0){
+      noteList.innerHTML = '<div class="empty-state"><strong>No notes yet</strong>Jot down upcoming income, planned spending or anything you want to remember.</div>';
+      return;
+    }
+
+    noteList.innerHTML = sorted.map(n => {
+      const amt = parseFloat(n.amount) || 0;
+      const overdue = !n.done && n.date && n.date < tk;
+      const canLog = !n.done && n.kind !== 'note' && amt > 0;
+      let meta = '<span class="tag ' + esc(n.kind) + '">' + esc(KIND_LABEL[n.kind] || 'Note') + '</span>';
+      if (n.date) meta += ' · ' + esc(labelFor(dateFromKey(n.date)));
+      if (amt > 0 && n.kind !== 'note') meta += ' · ' + (n.kind === 'income' ? '+' : '-') + fmt(amt);
+      if (overdue) meta += ' · <span class="overdue">Overdue</span>';
+      return '<div class="note' + (n.done ? ' done' : '') + '">' +
+        '<input type="checkbox" class="note-check" data-id="' + esc(n.id) + '" aria-label="Mark done"' + (n.done ? ' checked' : '') + '>' +
+        '<div class="note-body"><div class="note-text">' + esc(n.text) + '</div><div class="note-meta">' + meta + '</div></div>' +
+        '<div class="note-actions">' +
+          (canLog ? '<button type="button" class="note-log" data-id="' + esc(n.id) + '" title="Add this to your ledger">Log</button>' : '') +
+          '<button type="button" class="void-btn note-del" data-id="' + esc(n.id) + '" aria-label="Delete note">&times;</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  noteKind.addEventListener('change', () => {
+    const isNote = noteKind.value === 'note';
+    noteAmount.disabled = isNote;
+    if (isNote) noteAmount.value = '';
+  });
+
+  noteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = noteText.value.trim();
+    if (!text) return;
+    const kind = noteKind.value;
+    const amt = kind === 'note' ? 0 : (parseFloat(noteAmount.value) || 0);
+    notes.push({
+      id: 'n' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      text, kind, amount: amt,
+      date: noteDateInput.value || '',
+      done: false,
+      ts: Date.now()
+    });
+    noteText.value = '';
+    noteAmount.value = '';
+    noteDateInput.value = selected || '';
+    notesChanged();
+    noteText.focus();
+  });
+
+  noteList.addEventListener('click', (e) => {
+    const del = e.target.closest('.note-del');
+    const log = e.target.closest('.note-log');
+    if (del){
+      notes = notes.filter(n => n.id !== del.dataset.id);
+      notesChanged();
+    } else if (log){
+      const n = notes.find(x => x.id === log.dataset.id);
+      if (!n) return;
+      const when = new Date();
+      entries.push({
+        id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+        desc: n.text.slice(0, 60),
+        amount: String(n.amount),
+        type: n.kind,
+        date: labelFor(when),
+        ts: when.getTime()
+      });
+      notes = notes.filter(x => x.id !== n.id);
+      render();          // ledger, totals, ratio bar, calendar
+      notesChanged();    // saves notes, refreshes list, syncs both
+    }
+  });
+
+  noteList.addEventListener('change', (e) => {
+    const cb = e.target.closest('.note-check');
+    if (!cb) return;
+    const n = notes.find(x => x.id === cb.dataset.id);
+    if (n){ n.done = cb.checked; notesChanged(); }
+  });
+
   dateInput.value = todayKey();
   renderHeaderDate();
   tick();
   setInterval(tick, 1000);
   render();
+  renderNotes();
 
   // ============================================================
   // STEP 2 — Firebase sync (works offline, syncs when reconnected)
@@ -528,7 +772,7 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
   async function pushToCloud(){
     if (!docRef || applyingRemote || !setDocFn) return;
     try {
-      await setDocFn(docRef, { entries, updatedAt: Date.now() });
+      await setDocFn(docRef, { entries, notes, updatedAt: Date.now() });
       setStatus(navigator.onLine ? 'on' : 'pending', navigator.onLine ? 'Synced' : 'Saved locally — will sync when back online');
     } catch (err) {
       setStatus('pending', 'Saved locally — will sync when back online');
@@ -565,6 +809,11 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
         if (snap.exists()){
           applyingRemote = true;
           entries = snap.data().entries || [];
+          if (Array.isArray(snap.data().notes)){
+            notes = snap.data().notes;
+            saveNotes();
+            renderNotes();
+          }
           render();
           applyingRemote = false;
           setStatus(fromCache ? 'pending' : 'on', fromCache ? 'Offline — showing last synced copy' : 'Synced');
