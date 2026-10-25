@@ -122,6 +122,19 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--teal);outl
 
 footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft);letter-spacing:0.03em;}
 
+/* ---------- month / all-time scope bar + export ---------- */
+.scope-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:8px 10px;margin-bottom:12px;}
+.scope-bar .scope-label{flex:1;text-align:center;font-weight:700;font-size:0.95rem;}
+.scope-bar button{min-height:40px;min-width:40px;padding:6px 12px;font-weight:700;cursor:pointer;background:#fff;}
+.scope-bar button:hover:not(:disabled){background:var(--teal-bg);}
+.scope-bar button:disabled{opacity:0.35;cursor:default;}
+.scope-bar .scope-toggle{font-size:0.75rem;background:var(--ink);color:var(--paper);border:none;}
+.scope-bar .scope-toggle:hover{background:var(--teal);}
+.ledger-tools{display:flex;justify-content:flex-end;margin-top:10px;}
+.btn-csv{min-height:40px;padding:8px 16px;font-size:0.8rem;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--ink);}
+.btn-csv:hover:not(:disabled){background:var(--teal-bg);}
+.btn-csv:disabled{opacity:0.4;cursor:default;}
+
 /* ---------- notes & plans ---------- */
 .notes{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden;}
 .notes-head{background:var(--ink);color:var(--paper);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;}
@@ -229,6 +242,13 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         <button class="link-btn" id="sync-forget-btn" type="button" style="display:none">Disconnect</button>
       </div>
 
+      <div class="scope-bar" id="scope-bar">
+        <button type="button" id="scope-prev" aria-label="Previous month">&lsaquo;</button>
+        <span class="scope-label" id="scope-label">This month</span>
+        <button type="button" id="scope-next" aria-label="Next month">&rsaquo;</button>
+        <button type="button" class="scope-toggle" id="scope-toggle">Show all time</button>
+      </div>
+
       <div class="stamps">
         <div class="stamp income"><h3>Income</h3><p id="total-income">R0.00</p></div>
         <div class="stamp expenses"><h3>Expenses</h3><p id="total-expenses">R0.00</p></div>
@@ -237,7 +257,7 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
 
       <div class="ratio" id="ratio" role="group" aria-label="Spending versus income">
         <div class="ratio-top">
-          <span class="ratio-title">Spent vs income</span>
+          <span class="ratio-title" id="ratio-title">Spent vs income</span>
           <span class="ratio-pct" id="ratio-pct">0%</span>
         </div>
         <div class="ratio-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ratio-track">
@@ -275,6 +295,9 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
       <div class="ledger">
         <div class="ledger-head"><span>Date</span><span>Description</span><span>Amount</span><span></span></div>
         <div class="ledger-body" id="item-list"></div>
+      </div>
+      <div class="ledger-tools">
+        <button type="button" class="btn-csv" id="csv-btn">Download CSV</button>
       </div>
 
       <section class="notes" id="notes" aria-label="Notes and plans">
@@ -401,6 +424,17 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   let selected = null;           // 'YYYY-MM-DD' or null
   let lastToday = todayKey();
 
+  // Totals scope: the month shown on the calendar, or all time
+  const SCOPE_KEY = 'tacfundi_scope';
+  let scopeMonth = true;
+  try { scopeMonth = localStorage.getItem(SCOPE_KEY) !== 'all'; } catch(e) {}
+  const scopePrev = document.getElementById('scope-prev');
+  const scopeNext = document.getElementById('scope-next');
+  const scopeLabel = document.getElementById('scope-label');
+  const scopeToggle = document.getElementById('scope-toggle');
+  const ratioTitle = document.getElementById('ratio-title');
+  const csvBtn = document.getElementById('csv-btn');
+
   const calGrid = document.getElementById('cal-grid');
   const calTitle = document.getElementById('cal-title');
   const calSummary = document.getElementById('cal-summary');
@@ -494,7 +528,7 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   function shiftMonth(delta){
     const d = new Date(viewY, viewM + delta, 1);
     viewY = d.getFullYear(); viewM = d.getMonth();
-    renderCalendar();
+    render();   // totals follow the month, so refresh everything
   }
 
   calGrid.addEventListener('click', (e) => {
@@ -523,7 +557,12 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   function render(){
     itemList.innerHTML = '';
     let income = 0, expenses = 0;
+    const monthPrefix = viewY + '-' + pad(viewM + 1) + '-';
     entries.forEach(en => {
+      if (scopeMonth){
+        const k = entryKey(en);
+        if (!k || !k.startsWith(monthPrefix)) return;
+      }
       const v = parseFloat(en.amount) || 0;
       if (en.type === 'income') income += v; else expenses += v;
     });
@@ -560,6 +599,13 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     document.getElementById('total-income').textContent = fmt(income);
     document.getElementById('total-expenses').textContent = fmt(expenses);
     document.getElementById('total-balance').textContent = fmt(income - expenses);
+
+    const monthName = new Date(viewY, viewM, 1).toLocaleDateString('en-ZA', { month:'long', year:'numeric' });
+    scopeLabel.textContent = scopeMonth ? monthName : 'All time';
+    scopeToggle.textContent = scopeMonth ? 'Show all time' : 'Show month';
+    scopePrev.disabled = scopeNext.disabled = !scopeMonth;
+    ratioTitle.textContent = 'Spent vs income · ' + (scopeMonth ? new Date(viewY, viewM, 1).toLocaleDateString('en-ZA', { month:'long' }) : 'all time');
+    csvBtn.disabled = entries.length === 0;
 
     renderRatio(income, expenses);
     renderCalendar();
@@ -627,6 +673,45 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     render();
     pushToCloud();
     descInput.focus();
+  });
+
+  // ---- month / all-time scope controls ----
+  scopePrev.addEventListener('click', () => shiftMonth(-1));
+  scopeNext.addEventListener('click', () => shiftMonth(1));
+  scopeToggle.addEventListener('click', () => {
+    scopeMonth = !scopeMonth;
+    try { localStorage.setItem(SCOPE_KEY, scopeMonth ? 'month' : 'all'); } catch(e) {}
+    render();
+  });
+
+  // ---- CSV export (all ledger entries) ----
+  function csvCell(v){
+    let s = String(v == null ? '' : v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;      // stop spreadsheet formula injection
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  csvBtn.addEventListener('click', () => {
+    if (!entries.length) return;
+    const rows = entries.slice().sort((a, b) =>
+      (Number(a.ts) || parseInt(a.id, 10) || 0) - (Number(b.ts) || parseInt(b.id, 10) || 0));
+    const lines = ['Date,Description,Type,Amount'];
+    rows.forEach(en => {
+      lines.push([
+        csvCell(entryKey(en) || en.date || ''),
+        csvCell(en.desc),
+        csvCell(en.type === 'income' ? 'Income' : 'Expense'),
+        (parseFloat(en.amount) || 0).toFixed(2)
+      ].join(','));
+    });
+    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tac-fundi-ledger-' + todayKey() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 
   // ============================================================
