@@ -130,10 +130,74 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 .scope-bar button:disabled{opacity:0.35;cursor:default;}
 .scope-bar .scope-toggle{font-size:0.75rem;background:var(--ink);color:var(--paper);border:none;}
 .scope-bar .scope-toggle:hover{background:var(--teal);}
-.ledger-tools{display:flex;justify-content:flex-end;margin-top:10px;}
+.ledger-tools{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:10px;}
 .btn-csv{min-height:40px;padding:8px 16px;font-size:0.8rem;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--ink);}
 .btn-csv:hover:not(:disabled){background:var(--teal-bg);}
 .btn-csv:disabled{opacity:0.4;cursor:default;}
+
+/* ---------- statement (PDF export) ---------- */
+body.stmt-open{overflow:hidden;}
+.stmt-overlay{position:fixed;inset:0;z-index:1000;background:rgba(27,42,74,0.6);display:flex;flex-direction:column;}
+.stmt-overlay[hidden]{display:none;}
+.stmt-toolbar{background:var(--card);border-bottom:1px solid var(--paper-line);padding:10px 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+.stmt-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.stmt-controls select{flex:none;width:auto;}
+.stmt-controls label{display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:600;cursor:pointer;}
+input.stmt-chk{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-color:var(--teal);}
+.stmt-actions{display:flex;gap:8px;}
+.stmt-actions button{min-height:44px;font-weight:700;cursor:pointer;}
+.stmt-actions .btn-close{background:#fff;border:1px solid var(--ink);}
+.stmt-scroll{flex:1;overflow:auto;padding:16px 10px calc(24px + env(safe-area-inset-bottom));}
+.statement{background:#fff;color:#14213d;max-width:794px;margin:0 auto;padding:36px 34px;box-shadow:var(--shadow);font-size:13px;line-height:1.45;}
+.st-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:3px double var(--ink);padding-bottom:10px;margin-bottom:16px;}
+.st-brand{font-weight:800;font-size:22px;letter-spacing:-0.02em;}
+.st-brand em{font-style:normal;color:var(--gold);}
+.st-brand small{display:block;font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);}
+.st-title{text-align:right;font-weight:700;font-size:15px;}
+.st-title small{display:block;font-weight:400;font-size:11px;color:var(--ink-soft);}
+.st-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+.st-box{border:1px solid var(--paper-line);border-radius:8px;padding:8px 10px;}
+.st-box span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-soft);}
+.st-box b{font-size:16px;font-variant-numeric:tabular-nums;}
+.st-box.inc b{color:var(--gold);}
+.st-box.exp b{color:var(--brick);}
+.st-box.net b{color:var(--teal);}
+.st-h{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink);margin:18px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--ink);}
+.st-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+table.st{width:100%;border-collapse:collapse;font-size:12px;}
+table.st th{text-align:left;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);padding:5px 6px;border-bottom:1px solid var(--paper-line);}
+table.st td{padding:5px 6px;border-bottom:1px solid #ece8dc;vertical-align:top;}
+table.st .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+table.st tfoot td{font-weight:800;border-top:1px solid var(--ink);border-bottom:none;}
+table.st tr{break-inside:avoid;}
+table.st thead{display:table-header-group;}
+table.st td.pos{color:var(--gold);}
+table.st td.neg{color:var(--brick);}
+table.st tr.openrow td{font-weight:700;background:#f6f4ec;}
+.mini{height:5px;background:#ece8dc;border-radius:3px;margin-top:3px;}
+.mini i{display:block;height:100%;border-radius:3px;background:var(--brick);}
+.mini.inc i{background:var(--gold);}
+.st-note{margin-top:12px;font-size:11px;color:var(--ink-soft);}
+.st-foot{margin-top:22px;padding-top:8px;border-top:1px solid var(--paper-line);font-size:10px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:10px;}
+@media (max-width:640px){
+  .statement{padding:22px 16px;}
+  .st-summary{grid-template-columns:1fr 1fr;}
+  .st-two{grid-template-columns:1fr;}
+  .st-head{flex-direction:column;align-items:flex-start;}
+  .st-title{text-align:left;}
+}
+@media print{
+  @page{size:A4;margin:14mm;}
+  body.stmt-open{background:#fff !important;padding:0 !important;display:block !important;min-height:0 !important;overflow:visible !important;}
+  body.stmt-open .sheet{display:none !important;}
+  body.stmt-open .stmt-overlay{position:static !important;background:none !important;display:block !important;}
+  body.stmt-open .stmt-toolbar{display:none !important;}
+  body.stmt-open .stmt-scroll{overflow:visible !important;padding:0 !important;}
+  body.stmt-open .statement{box-shadow:none !important;max-width:none !important;margin:0 !important;padding:0 !important;font-size:11.5px;}
+  body.stmt-open .st-two{grid-template-columns:1fr 1fr !important;}
+  body.stmt-open .st-summary{grid-template-columns:repeat(3,1fr) !important;}
+  body.stmt-open *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
 
 /* ---------- categories + charts ---------- */
 #cat{flex:1;}
@@ -344,6 +408,7 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         <div class="ledger-body" id="item-list"></div>
       </div>
       <div class="ledger-tools">
+        <button type="button" class="btn-csv" id="stmt-open">Statement (PDF)</button>
         <button type="button" class="btn-csv" id="csv-btn">Download CSV</button>
       </div>
 
@@ -426,6 +491,28 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         <div class="cal-summary" id="cal-summary"></div>
       </div>
     </aside>
+  </div>
+</div>
+
+<!-- Statement / PDF export overlay -->
+<div class="stmt-overlay" id="stmt-overlay" hidden role="dialog" aria-modal="true" aria-label="Financial statement">
+  <div class="stmt-toolbar">
+    <div class="stmt-controls">
+      <div class="seg">
+        <button type="button" id="stmt-type-month" class="on">Monthly</button>
+        <button type="button" id="stmt-type-year">Annual</button>
+      </div>
+      <select id="stmt-month" aria-label="Month"></select>
+      <select id="stmt-year" aria-label="Year"></select>
+      <label><input type="checkbox" class="stmt-chk" id="stmt-tx" checked> Transactions</label>
+    </div>
+    <div class="stmt-actions">
+      <button type="button" class="btn-add" id="stmt-print">Save as PDF</button>
+      <button type="button" class="btn-close" id="stmt-close">Close</button>
+    </div>
+  </div>
+  <div class="stmt-scroll">
+    <article class="statement" id="statement"></article>
   </div>
 </div>
 
@@ -928,6 +1015,174 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   });
   brkExp.addEventListener('click', () => { brkType = 'expense'; renderCharts(); });
   brkInc.addEventListener('click', () => { brkType = 'income'; renderCharts(); });
+
+  // ============================================================
+  // Statement / PDF export (monthly or annual) — uses the browser's
+  // "Save as PDF" so there are no extra libraries and it works offline
+  // ============================================================
+  const stmtOverlay = document.getElementById('stmt-overlay');
+  const stmtEl = document.getElementById('statement');
+  const stmtTypeM = document.getElementById('stmt-type-month');
+  const stmtTypeY = document.getElementById('stmt-type-year');
+  const stmtMonth = document.getElementById('stmt-month');
+  const stmtYear = document.getElementById('stmt-year');
+  const stmtTx = document.getElementById('stmt-tx');
+  let stmtType = 'month';
+  const MONTH_NAMES = Array.from({ length:12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString('en-ZA', { month:'long' }));
+  stmtMonth.innerHTML = MONTH_NAMES.map((n, i) => '<option value="' + i + '">' + n + '</option>').join('');
+
+  const fmtS = n => (n < 0 ? '-' : '') + fmt(Math.abs(n));
+  const pctOf = (v, t) => t > 0 ? (v / t * 100).toFixed(1) + '%' : '—';
+
+  function fillStmtYears(){
+    const ys = new Set([new Date().getFullYear(), viewY]);
+    entries.forEach(en => { const k = entryKey(en); if (k) ys.add(Number(k.slice(0, 4))); });
+    stmtYear.innerHTML = [...ys].sort((a, b) => a - b).map(y => '<option value="' + y + '">' + y + '</option>').join('');
+  }
+
+  function setStmtType(t){
+    stmtType = t;
+    stmtTypeM.classList.toggle('on', t === 'month');
+    stmtTypeY.classList.toggle('on', t === 'year');
+    stmtMonth.style.display = t === 'month' ? '' : 'none';
+    stmtTx.checked = t === 'month';        // annual defaults to a summary without every transaction
+    buildStatement();
+  }
+
+  function openStatement(){
+    fillStmtYears();
+    stmtYear.value = String(viewY);
+    stmtMonth.value = String(viewM);
+    stmtOverlay.hidden = false;
+    document.body.classList.add('stmt-open');
+    setStmtType('month');
+  }
+  function closeStatement(){
+    stmtOverlay.hidden = true;
+    document.body.classList.remove('stmt-open');
+  }
+
+  function catTable(map, total, cls, heading){
+    const rows = Object.keys(map).map(k => ({ name:k, v:map[k] })).sort((a, b) => b.v - a.v);
+    if (!rows.length) return '';
+    const top = rows[0].v || 1;
+    return '<div><div class="st-h">' + esc(heading) + '</div><table class="st"><thead><tr><th>Category</th><th class="r">Amount</th><th class="r">Share</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td>' + esc(r.name) + '<div class="mini ' + cls + '"><i style="width:' + Math.max(2, Math.round(r.v / top * 100)) + '%"></i></div></td><td class="r">' + fmt(r.v) + '</td><td class="r">' + pctOf(r.v, total) + '</td></tr>').join('') +
+      '</tbody></table></div>';
+  }
+
+  function buildStatement(){
+    const annual = stmtType === 'year';
+    const y = Number(stmtYear.value), m = Number(stmtMonth.value);
+    const start = annual ? new Date(y, 0, 1) : new Date(y, m, 1);
+    const end = annual ? new Date(y + 1, 0, 1) : new Date(y, m + 1, 1);   // exclusive
+    const sT = start.getTime(), eT = end.getTime();
+
+    const dated = []; let undated = 0;
+    entries.forEach(en => {
+      const t = Number(en.ts) || parseInt(en.id, 10);
+      if (Number.isFinite(t)) dated.push({ en, t }); else undated++;
+    });
+    dated.sort((a, b) => a.t - b.t);
+
+    const amt = en => parseFloat(en.amount) || 0;
+    let opening = 0;
+    dated.forEach(x => { if (x.t < sT) opening += (x.en.type === 'income' ? 1 : -1) * amt(x.en); });
+    const rows = dated.filter(x => x.t >= sT && x.t < eT);
+    let inc = 0, exp = 0;
+    rows.forEach(x => { if (x.en.type === 'income') inc += amt(x.en); else exp += amt(x.en); });
+    const net = inc - exp, closing = opening + net;
+
+    const fd = d => d.toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+    const title = annual ? 'Annual summary — ' + y : 'Monthly statement — ' + MONTH_NAMES[m] + ' ' + y;
+    const now = new Date();
+
+    let h = '<div class="st-head">' +
+      '<div class="st-brand">TAC <em>Fundi</em><small>Personal Ledger</small></div>' +
+      '<div class="st-title">' + esc(title) + '<small>' + esc(fd(start) + ' – ' + fd(new Date(eT - 1))) + ' · amounts in ZAR</small></div></div>';
+
+    h += '<div class="st-summary">' +
+      '<div class="st-box"><span>Opening balance</span><b>' + fmtS(opening) + '</b></div>' +
+      '<div class="st-box inc"><span>Money in</span><b>' + fmt(inc) + '</b></div>' +
+      '<div class="st-box exp"><span>Money out</span><b>' + fmt(exp) + '</b></div>' +
+      '<div class="st-box net"><span>Net movement</span><b>' + fmtS(net) + '</b></div>' +
+      '<div class="st-box net"><span>Closing balance</span><b>' + fmtS(closing) + '</b></div>' +
+      '<div class="st-box"><span>Spent of income</span><b>' + (inc > 0 ? Math.round(exp / inc * 100) + '%' : '—') + '</b></div>' +
+      '</div>';
+
+    if (!rows.length){
+      h += '<p class="st-note">No transactions were recorded in this period.</p>';
+    } else {
+      // annual: month-by-month table
+      if (annual){
+        const mon = Array.from({ length:12 }, () => ({ inc:0, exp:0 }));
+        rows.forEach(x => { const mi = new Date(x.t).getMonth(); if (x.en.type === 'income') mon[mi].inc += amt(x.en); else mon[mi].exp += amt(x.en); });
+        let run = opening;
+        h += '<div class="st-h">Month by month</div><table class="st"><thead><tr><th>Month</th><th class="r">Money in</th><th class="r">Money out</th><th class="r">Net</th><th class="r">Spent of income</th><th class="r">Closing balance</th></tr></thead><tbody>' +
+          mon.map((mo, i) => {
+            const n = mo.inc - mo.exp; run += n;
+            return '<tr><td>' + MONTH_NAMES[i] + '</td><td class="r">' + fmt(mo.inc) + '</td><td class="r">' + fmt(mo.exp) + '</td><td class="r ' + (n < 0 ? 'neg' : 'pos') + '">' + fmtS(n) + '</td><td class="r">' + (mo.inc > 0 ? Math.round(mo.exp / mo.inc * 100) + '%' : '—') + '</td><td class="r">' + fmtS(run) + '</td></tr>';
+          }).join('') +
+          '</tbody><tfoot><tr><td>Total</td><td class="r">' + fmt(inc) + '</td><td class="r">' + fmt(exp) + '</td><td class="r">' + fmtS(net) + '</td><td class="r">' + (inc > 0 ? Math.round(exp / inc * 100) + '%' : '—') + '</td><td class="r">' + fmtS(closing) + '</td></tr></tfoot></table>';
+      }
+
+      // category breakdowns + biggest items
+      const sc = {}, ic = {}, items = {};
+      rows.forEach(x => {
+        const c = x.en.cat || 'Uncategorised', v = amt(x.en);
+        if (x.en.type === 'income') ic[c] = (ic[c] || 0) + v;
+        else {
+          sc[c] = (sc[c] || 0) + v;
+          const key = String(x.en.desc || '').trim().toLowerCase();
+          const it = items[key] || (items[key] = { name: String(x.en.desc || '').trim() || '(no description)', sum:0, n:0 });
+          it.sum += v; it.n++;
+        }
+      });
+      h += '<div class="st-two">' + catTable(sc, exp, '', 'Spending by category') + catTable(ic, inc, 'inc', 'Income by category') + '</div>';
+
+      const top = Object.keys(items).map(k => items[k]).sort((a, b) => b.sum - a.sum).slice(0, 5);
+      if (top.length){
+        h += '<div class="st-h">Biggest spending items</div><table class="st"><tbody>' +
+          top.map(it => '<tr><td>' + esc(it.name) + (it.n > 1 ? ' <span style="color:#4d5a72">×' + it.n + '</span>' : '') + '</td><td class="r">' + fmt(it.sum) + '</td></tr>').join('') +
+          '</tbody></table>';
+      }
+
+      // transaction list with running balance
+      if (stmtTx.checked){
+        let run = opening;
+        h += '<div class="st-h">Transactions</div><table class="st"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="r">Money in</th><th class="r">Money out</th><th class="r">Balance</th></tr></thead><tbody>' +
+          '<tr class="openrow"><td colspan="5">Opening balance</td><td class="r">' + fmtS(opening) + '</td></tr>' +
+          rows.map(x => {
+            const isInc = x.en.type === 'income', v = amt(x.en);
+            run += isInc ? v : -v;
+            const d = new Date(x.t).toLocaleDateString('en-ZA', annual ? { day:'numeric', month:'short', year:'2-digit' } : { day:'numeric', month:'short' });
+            return '<tr><td>' + esc(d) + '</td><td>' + esc(x.en.desc || '') + '</td><td>' + esc(x.en.cat || '') + '</td>' +
+              '<td class="r pos">' + (isInc ? fmt(v) : '') + '</td><td class="r neg">' + (isInc ? '' : fmt(v)) + '</td><td class="r">' + fmtS(run) + '</td></tr>';
+          }).join('') +
+          '</tbody><tfoot><tr><td colspan="3">Closing balance</td><td class="r">' + fmt(inc) + '</td><td class="r">' + fmt(exp) + '</td><td class="r">' + fmtS(closing) + '</td></tr></tfoot></table>';
+      }
+    }
+
+    if (undated > 0) h += '<p class="st-note">' + undated + (undated === 1 ? ' entry has' : ' entries have') + ' no date and ' + (undated === 1 ? 'is' : 'are') + ' not included.</p>';
+    h += '<div class="st-foot"><span>Generated by TAC Fundi</span><span>' + esc(now.toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' }) + ', ' + pad(now.getHours()) + ':' + pad(now.getMinutes())) + '</span></div>';
+    stmtEl.innerHTML = h;
+  }
+
+  document.getElementById('stmt-open').addEventListener('click', openStatement);
+  document.getElementById('stmt-close').addEventListener('click', closeStatement);
+  stmtTypeM.addEventListener('click', () => setStmtType('month'));
+  stmtTypeY.addEventListener('click', () => setStmtType('year'));
+  stmtMonth.addEventListener('change', buildStatement);
+  stmtYear.addEventListener('change', buildStatement);
+  stmtTx.addEventListener('change', buildStatement);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !stmtOverlay.hidden) closeStatement(); });
+  document.getElementById('stmt-print').addEventListener('click', () => {
+    const old = document.title;
+    const y = stmtYear.value;
+    document.title = 'TAC Fundi statement ' + (stmtType === 'year' ? y : y + '-' + pad(Number(stmtMonth.value) + 1));
+    window.addEventListener('afterprint', () => { document.title = old; }, { once:true });
+    window.print();
+  });
 
   // ============================================================
   // Notes & plans (future spending / income / anything else)
