@@ -135,6 +135,64 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 .btn-csv:hover:not(:disabled){background:var(--teal-bg);}
 .btn-csv:disabled{opacity:0.4;cursor:default;}
 
+/* ---------- tabs + search/filter bar ---------- */
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tabs button{flex:1;min-height:46px;font-weight:800;font-size:0.9rem;cursor:pointer;background:var(--card);border:1px solid var(--paper-line);border-radius:10px;color:var(--ink-soft);}
+.tabs button.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.tabs button:hover:not(.on){background:var(--teal-bg);}
+.searchbar{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:var(--shadow);}
+.sb-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;}
+.sb-row input[type=search]{flex:1 1 200px;}
+.sb-row select{flex:1 1 130px;width:auto;}
+.sb-row label{display:flex;align-items:center;gap:6px;flex:1 1 150px;font-size:0.75rem;font-weight:700;color:var(--ink-soft);}
+.sb-row label input{flex:1;}
+.sb-clear{min-height:44px;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--ink);}
+.sb-hint{font-size:0.68rem;color:var(--ink-soft);}
+.sb-summary{margin-top:8px;padding-top:8px;border-top:1px dashed var(--paper-line);font-size:0.8rem;color:var(--ink-soft);}
+.sb-summary b{color:var(--ink);}
+.sb-summary .inc{color:var(--gold);}
+.sb-summary .exp{color:var(--brick);}
+
+/* ---------- net worth tab ---------- */
+#nw-kind{flex:0 0 120px;}
+#nw-cls{flex:1;}
+.nw-delta{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:10px 14px;margin:-8px 0 8px;font-size:0.85rem;color:var(--ink-soft);box-shadow:var(--shadow);}
+.good{color:var(--teal);font-weight:700;}
+.bad{color:var(--brick);font-weight:700;}
+.nw-plotwrap{padding:0 10px;margin-top:10px;}
+.nw-plot{position:relative;height:150px;}
+.nw-plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.nw-line{fill:none;stroke:var(--teal);stroke-width:2.5;vector-effect:non-scaling-stroke;stroke-linejoin:round;}
+.nw-area{fill:var(--teal);opacity:0.12;}
+.nw-zero{stroke:var(--ink-soft);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;opacity:0.6;}
+.nw-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--teal);transform:translate(-50%,-50%);border:2px solid var(--card);box-sizing:content-box;}
+.nw-dot.last{width:10px;height:10px;background:var(--gold);}
+.nw-ylab{position:absolute;left:0;font-size:0.6rem;font-weight:700;color:var(--ink-soft);background:rgba(243,241,233,0.85);padding:0 3px;border-radius:3px;}
+.nw-ylab.top{top:-2px;}
+.nw-ylab.bot{bottom:-2px;}
+.nw-xlabs{display:flex;justify-content:space-between;margin-top:10px;padding:0 4px;font-size:0.6rem;font-weight:700;color:var(--ink-soft);}
+.nw-stack{display:flex;height:16px;border-radius:999px;overflow:hidden;background:var(--paper-line);margin:8px 0 12px;}
+.nw-stack i{display:block;height:100%;}
+.nw-leg{display:flex;justify-content:space-between;gap:8px;font-size:0.82rem;padding:4px 0;}
+.nw-leg .sw{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:8px;}
+.nw-group{font-weight:800;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);margin:6px 0 4px;}
+.nw-item{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--paper-line);}
+.nw-item:last-child{border-bottom:none;}
+.nw-name{font-weight:700;word-break:break-word;}
+.nw-meta{font-size:0.7rem;color:var(--ink-soft);margin-top:3px;}
+.nw-meta .tag{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:700;font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;background:var(--paper-line);color:var(--ink);}
+.nw-val{font-weight:800;font-size:1.05rem;text-align:right;font-variant-numeric:tabular-nums;}
+.nw-val.neg{color:var(--brick);}
+.nw-act{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.nw-act input.nw-upd{flex:1 1 110px;}
+.nw-act input.nw-upd-date{flex:1 1 130px;}
+.nw-save{min-height:44px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--paper);border:none;padding:8px 16px;}
+.nw-save:hover{background:var(--teal);}
+.nw-hist{grid-column:1/-1;font-size:0.78rem;color:var(--ink-soft);}
+.nw-hist summary{cursor:pointer;font-weight:600;}
+.nw-hist div{display:flex;justify-content:space-between;padding:3px 0;}
+@media (max-width:480px){ .nw-xlabs span:nth-child(even){visibility:hidden;} }
+
 /* ---------- statement (PDF export) ---------- */
 body.stmt-open{overflow:hidden;}
 .stmt-overlay{position:fixed;inset:0;z-index:1000;background:rgba(27,42,74,0.6);display:flex;flex-direction:column;}
@@ -350,6 +408,13 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         <button class="link-btn" id="sync-forget-btn" type="button" style="display:none">Disconnect</button>
       </div>
 
+      <nav class="tabs" aria-label="Sections">
+        <button type="button" data-tab="ledger" class="on">Ledger</button>
+        <button type="button" data-tab="worth">Net worth</button>
+      </nav>
+
+      <div id="tab-ledger">
+
       <div class="scope-bar" id="scope-bar">
         <button type="button" id="scope-prev" aria-label="Previous month">&lsaquo;</button>
         <span class="scope-label" id="scope-label">This month</span>
@@ -397,6 +462,33 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
           <select id="cat" aria-label="Category"></select>
         </div>
       </form>
+
+      <div class="searchbar" id="searchbar">
+        <div class="sb-row">
+          <input type="search" id="f-q" placeholder="Search…  e.g. checkers &gt;200 cat:groceries" autocomplete="off" aria-label="Search entries" />
+          <button type="button" class="sb-clear" id="f-clear">Clear</button>
+        </div>
+        <div class="sb-row">
+          <div class="seg" id="f-type">
+            <button type="button" data-t="all" class="on">All</button>
+            <button type="button" data-t="income">Income</button>
+            <button type="button" data-t="expense">Spending</button>
+          </div>
+          <select id="f-cat" aria-label="Category"></select>
+          <select id="f-sort" aria-label="Sort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+            <option value="big">Largest amount</option>
+            <option value="small">Smallest amount</option>
+          </select>
+        </div>
+        <div class="sb-row">
+          <label>From <input type="date" id="f-from" /></label>
+          <label>To <input type="date" id="f-to" /></label>
+        </div>
+        <div class="sb-hint">Tips: <b>&gt;500</b> <b>&lt;100</b> <b>&gt;=50</b> for amounts · <b>cat:transport</b> · <b>type:income</b> · several words must all match.</div>
+        <div class="sb-summary" id="f-summary" hidden></div>
+      </div>
 
       <div class="filter-bar" id="filter-bar">
         <span id="filter-label"></span>
@@ -461,6 +553,55 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         </form>
         <div class="note-list" id="note-list"></div>
       </section>
+
+      </div><!-- /tab-ledger -->
+
+      <!-- ===================== NET WORTH TAB ===================== -->
+      <div id="tab-worth" hidden>
+        <div class="stamps">
+          <div class="stamp income"><h3>Assets</h3><p id="nw-assets">R0.00</p></div>
+          <div class="stamp expenses"><h3>Liabilities</h3><p id="nw-liab">R0.00</p></div>
+          <div class="stamp balance"><h3>Net worth</h3><p id="nw-net">R0.00</p></div>
+        </div>
+        <div class="nw-delta" id="nw-delta"></div>
+
+        <section class="charts" aria-label="Net worth over time">
+          <div class="charts-head">Net worth over time</div>
+          <div class="chart-card">
+            <div class="chart-title">Month-end net worth · last 12 months</div>
+            <div id="nw-chart"></div>
+          </div>
+        </section>
+
+        <section class="charts" aria-label="Where your assets sit">
+          <div class="charts-head">Where your assets sit</div>
+          <div class="chart-card" id="nw-alloc"></div>
+        </section>
+
+        <form id="nw-form">
+          <div class="form-title">Add an asset or liability</div>
+          <div class="row">
+            <input type="text" id="nw-name" placeholder="Name — e.g. Savings account, Business share, Laptop" required maxlength="60" />
+          </div>
+          <div class="row">
+            <select id="nw-kind" aria-label="Asset or liability">
+              <option value="asset">Asset</option>
+              <option value="liability">Liability</option>
+            </select>
+            <select id="nw-cls" aria-label="Class"></select>
+          </div>
+          <div class="row">
+            <input type="number" id="nw-value" inputmode="decimal" placeholder="Value now (R)" step="0.01" min="0" required />
+            <input type="date" id="nw-date" aria-label="As at date" />
+            <button type="submit" class="btn-add">Add</button>
+          </div>
+        </form>
+
+        <section class="charts" aria-label="Assets and liabilities">
+          <div class="charts-head">Assets &amp; liabilities</div>
+          <div class="chart-card" id="nw-list"></div>
+        </section>
+      </div>
 
       <footer>Saved instantly on this device · syncs to your other devices once connected</footer>
     </div>
@@ -541,6 +682,12 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   let notes = [];
   try { notes = JSON.parse(localStorage.getItem(NOTES_KEY)) || []; } catch(e) { notes = []; }
   function saveNotes(){ try { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); } catch(e) {} }
+
+  // Net worth tracker: each item keeps dated value snapshots in `history`
+  const ACC_KEY = 'tacfundi_assets_v1';
+  let accounts = [];
+  try { accounts = JSON.parse(localStorage.getItem(ACC_KEY)) || []; } catch(e) { accounts = []; }
+  function saveAccounts(){ try { localStorage.setItem(ACC_KEY, JSON.stringify(accounts)); } catch(e) {} }
 
   const form = document.getElementById('budget-form');
   const descInput = document.getElementById('desc');
@@ -736,8 +883,10 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
       if (en.type === 'income') income += v; else expenses += v;
     });
 
-    const visible = (selected ? entries.filter(en => entryKey(en) === selected) : entries.slice())
-      .sort((a, b) => (Number(b.ts) || parseInt(b.id, 10) || 0) - (Number(a.ts) || parseInt(a.id, 10) || 0));
+    const base = selected ? entries.filter(en => entryKey(en) === selected) : entries.slice();
+    const parsedQ = parseQuery(fq);
+    const visible = base.filter(en => matchesFilter(en, parsedQ)).sort(sorterFor(fsort));
+    renderFilterSummary(base.length, visible);
 
     if (selected){
       filterBar.classList.add('show');
@@ -747,7 +896,9 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     }
 
     if (visible.length === 0){
-      itemList.innerHTML = selected
+      itemList.innerHTML = filtersActive()
+        ? '<div class="empty-state"><strong>No matches</strong>Try a different search or press Clear.</div>'
+        : selected
         ? '<div class="empty-state"><strong>Nothing on this day</strong>Add an entry above and it will land on this date.</div>'
         : '<div class="empty-state"><strong>No entries yet</strong>Add your first income or expense above.</div>';
     }
@@ -1185,6 +1336,307 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   });
 
   // ============================================================
+  // Smart search & filter (Ledger tab)
+  // ============================================================
+  const fQ = document.getElementById('f-q');
+  const fCat = document.getElementById('f-cat');
+  const fSort = document.getElementById('f-sort');
+  const fFrom = document.getElementById('f-from');
+  const fTo = document.getElementById('f-to');
+  const fSummary = document.getElementById('f-summary');
+  const fTypeBtns = document.querySelectorAll('#f-type button');
+  let fq = '', ftype = 'all', fcat = '', ffrom = '', fto = '', fsort = 'new';
+
+  const ALL_CATS = [...new Set([...EXP_CATS, ...INC_CATS])];
+  fCat.innerHTML = '<option value="">All categories</option>' +
+    ALL_CATS.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('') +
+    '<option value="__none">Uncategorised</option>';
+
+  function filtersActive(){ return !!(fq.trim() || ftype !== 'all' || fcat || ffrom || fto); }
+
+  // understands: >500  <100  >=50  <=20  =75   cat:groceries   type:income / is:expense   plain words
+  function parseQuery(q){
+    const P = { words:[], cmps:[], cat:'', type:'' };
+    q.trim().toLowerCase().split(/\s+/).filter(Boolean).forEach(t => {
+      let m;
+      if ((m = t.match(/^(>=|<=|>|<|=)r?(\d+(?:[.,]\d+)?)$/))) P.cmps.push({ op:m[1], v:parseFloat(m[2].replace(',', '.')) });
+      else if (t.startsWith('cat:') && t.length > 4) P.cat = t.slice(4);
+      else if ((t.startsWith('type:') || t.startsWith('is:')) && t.split(':')[1]){
+        const x = t.split(':')[1];
+        P.type = (x.startsWith('inc') || x === 'in') ? 'income' : 'expense';
+      }
+      else P.words.push(t);
+    });
+    return P;
+  }
+
+  function matchesFilter(en, P){
+    const v = parseFloat(en.amount) || 0;
+    const isInc = en.type === 'income';
+    if (ftype !== 'all' && isInc !== (ftype === 'income')) return false;
+    if (fcat){
+      const c = en.cat || '';
+      if (fcat === '__none'){ if (c) return false; } else if (c !== fcat) return false;
+    }
+    if (ffrom || fto){
+      const k = entryKey(en);
+      if (!k) return false;
+      if (ffrom && k < ffrom) return false;
+      if (fto && k > fto) return false;
+    }
+    if (P.type && isInc !== (P.type === 'income')) return false;
+    if (P.cat && !(en.cat || 'uncategorised').toLowerCase().includes(P.cat)) return false;
+    for (const c of P.cmps){
+      if (c.op === '>' && !(v > c.v)) return false;
+      if (c.op === '>=' && !(v >= c.v)) return false;
+      if (c.op === '<' && !(v < c.v)) return false;
+      if (c.op === '<=' && !(v <= c.v)) return false;
+      if (c.op === '=' && !(Math.abs(v - c.v) < 0.005)) return false;
+    }
+    if (P.words.length){
+      const hay = [en.desc, en.cat, isInc ? 'income' : 'expense', en.date, entryKey(en), v.toFixed(2), en.amount].join(' ').toLowerCase();
+      for (const w of P.words) if (!hay.includes(w)) return false;
+    }
+    return true;
+  }
+
+  function sorterFor(mode){
+    const ts = en => Number(en.ts) || parseInt(en.id, 10) || 0;
+    const amt = en => parseFloat(en.amount) || 0;
+    if (mode === 'old') return (a, b) => ts(a) - ts(b);
+    if (mode === 'big') return (a, b) => amt(b) - amt(a);
+    if (mode === 'small') return (a, b) => amt(a) - amt(b);
+    return (a, b) => ts(b) - ts(a);
+  }
+
+  function renderFilterSummary(baseCount, list){
+    if (!filtersActive()){ fSummary.hidden = true; return; }
+    let inc = 0, exp = 0;
+    list.forEach(en => { const v = parseFloat(en.amount) || 0; if (en.type === 'income') inc += v; else exp += v; });
+    fSummary.hidden = false;
+    fSummary.innerHTML = 'Showing <b>' + list.length + '</b> of ' + baseCount + (list.length === 1 ? ' entry' : ' entries') +
+      ' · in <b class="inc">' + fmt(inc) + '</b> · out <b class="exp">' + fmt(exp) + '</b> · net <b>' + fmtS(inc - exp) + '</b>';
+  }
+
+  fQ.addEventListener('input', () => { fq = fQ.value; render(); });
+  fCat.addEventListener('change', () => { fcat = fCat.value; render(); });
+  fSort.addEventListener('change', () => { fsort = fSort.value; render(); });
+  fFrom.addEventListener('change', () => { ffrom = fFrom.value; render(); });
+  fTo.addEventListener('change', () => { fto = fTo.value; render(); });
+  fTypeBtns.forEach(b => b.addEventListener('click', () => {
+    ftype = b.dataset.t;
+    fTypeBtns.forEach(x => x.classList.toggle('on', x === b));
+    render();
+  }));
+  document.getElementById('f-clear').addEventListener('click', () => {
+    fq = ''; ftype = 'all'; fcat = ''; ffrom = ''; fto = ''; fsort = 'new';
+    fQ.value = ''; fCat.value = ''; fSort.value = 'new'; fFrom.value = ''; fTo.value = '';
+    fTypeBtns.forEach(x => x.classList.toggle('on', x.dataset.t === 'all'));
+    render();
+  });
+
+  // ============================================================
+  // Tabs + Net worth & asset tracker
+  // ============================================================
+  const ASSET_CLS = ['Liquid savings','Business equity','Equipment & tools','Investments','Property','Vehicle','Other asset'];
+  const LIAB_CLS = ['Loan / finance','Credit card','Other debt'];
+  const PALETTE = ['#1f5c50','#8a6d1e','#1b2a4a','#93362a','#6b7fa3','#8c9a5b','#b07a9e'];
+
+  const nwForm = document.getElementById('nw-form');
+  const nwName = document.getElementById('nw-name');
+  const nwKind = document.getElementById('nw-kind');
+  const nwCls = document.getElementById('nw-cls');
+  const nwValue = document.getElementById('nw-value');
+  const nwDate = document.getElementById('nw-date');
+  const nwList = document.getElementById('nw-list');
+  const nwChart = document.getElementById('nw-chart');
+  const nwAlloc = document.getElementById('nw-alloc');
+  const nwDelta = document.getElementById('nw-delta');
+
+  function clsOptions(kind){
+    return (kind === 'liability' ? LIAB_CLS : ASSET_CLS).map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+  }
+  nwCls.innerHTML = clsOptions('asset');
+  nwKind.addEventListener('change', () => { nwCls.innerHTML = clsOptions(nwKind.value); });
+  nwDate.value = todayKey();
+
+  const fmtDay = k => dateFromKey(k).toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+  const nwCompact = n => (n < 0 ? '-' : '') + 'R' + compact(Math.abs(n));
+  const accCurrent = a => a.history.length ? a.history[a.history.length - 1].v : 0;
+  function accValueAt(a, endKey){            // last snapshot on/before endKey, or null if it didn't exist yet
+    let v = null;
+    for (const h of a.history){ if (h.d <= endKey) v = h.v; else break; }
+    return v;
+  }
+  function addSnapshot(a, d, v){
+    const ex = a.history.find(h => h.d === d);
+    if (ex) ex.v = v;
+    else { a.history.push({ d, v }); a.history.sort((x, y) => x.d < y.d ? -1 : x.d > y.d ? 1 : 0); }
+  }
+  function accountsChanged(){ saveAccounts(); renderWorth(); pushToCloud(); }
+
+  function renderWorth(){
+    const tk = todayKey();
+    nwDate.max = tk;
+
+    let A = 0, L = 0;
+    accounts.forEach(a => { if (a.kind === 'liability') L += accCurrent(a); else A += accCurrent(a); });
+    document.getElementById('nw-assets').textContent = fmt(A);
+    document.getElementById('nw-liab').textContent = fmt(L);
+    document.getElementById('nw-net').textContent = fmtS(A - L);
+
+    // ---- month-end series, last 12 months ----
+    const now = new Date();
+    const series = [];
+    for (let i = 11; i >= 0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const eom = keyOf(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+      const endKey = i === 0 ? tk : eom;
+      let any = false, net = 0;
+      accounts.forEach(a => {
+        const v = accValueAt(a, endKey);
+        if (v === null) return;
+        any = true;
+        net += a.kind === 'liability' ? -v : v;
+      });
+      series.push({ label: d.toLocaleDateString('en-ZA', { month:'short' }), name: d.toLocaleDateString('en-ZA', { month:'long' }), net, any });
+    }
+
+    // change vs end of last month
+    const prev = series[10], cur = series[11];
+    if (prev.any && cur.any){
+      const diff = cur.net - prev.net;
+      nwDelta.innerHTML = '<span class="' + (diff >= 0 ? 'good' : 'bad') + '">' + (diff >= 0 ? '▲ ' : '▼ ') + fmt(Math.abs(diff)) + '</span> since the end of ' + esc(prev.name);
+    } else if (accounts.length){
+      nwDelta.textContent = 'Update your values next month (or add an earlier date) to see how your net worth is changing.';
+    } else {
+      nwDelta.textContent = 'Add your savings, business equity, equipment and any debts to start tracking your net worth.';
+    }
+
+    // ---- line chart ----
+    const first = series.findIndex(s => s.any);
+    const pts = first < 0 ? [] : series.slice(first);
+    if (pts.length < 2){
+      nwChart.innerHTML = '<div class="empty-state"><strong>Not enough history yet</strong>The trend line appears once you have values in two different months. Use the date field to add an earlier value.</div>';
+    } else {
+      const vals = pts.map(p => p.net);
+      const realMax = Math.max(...vals), realMin = Math.min(...vals);
+      let mn = realMin, mx = realMax;
+      if (mn === mx){ mn -= 1; mx += 1; }
+      const padv = (mx - mn) * 0.14; mn -= padv; mx += padv;
+      const X = i => i / (pts.length - 1) * 100;
+      const Y = v => (1 - (v - mn) / (mx - mn)) * 100;
+      const line = pts.map((p, i) => X(i).toFixed(2) + ',' + Y(p.net).toFixed(2)).join(' ');
+      const zero = (mn < 0 && mx > 0) ? '<line class="nw-zero" x1="0" x2="100" y1="' + Y(0).toFixed(2) + '" y2="' + Y(0).toFixed(2) + '"/>' : '';
+      nwChart.innerHTML =
+        '<div class="nw-plotwrap"><div class="nw-plot">' +
+          '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + zero +
+            '<polygon class="nw-area" points="' + line + ' 100,100 0,100"/><polyline class="nw-line" points="' + line + '"/></svg>' +
+          pts.map((p, i) => '<span class="nw-dot' + (i === pts.length - 1 ? ' last' : '') + '" style="left:' + X(i).toFixed(2) + '%;top:' + Y(p.net).toFixed(2) + '%" title="' + esc(p.name + ': ' + fmtS(p.net)) + '"></span>').join('') +
+          '<span class="nw-ylab top">' + nwCompact(realMax) + '</span><span class="nw-ylab bot">' + nwCompact(realMin) + '</span>' +
+        '</div></div>' +
+        '<div class="nw-xlabs">' + pts.map(p => '<span>' + esc(p.label) + '</span>').join('') + '</div>';
+    }
+
+    // ---- allocation of assets ----
+    const byCls = {};
+    accounts.filter(a => a.kind !== 'liability').forEach(a => { byCls[a.cls] = (byCls[a.cls] || 0) + accCurrent(a); });
+    const rows = Object.keys(byCls).map(k => ({ name:k, v:byCls[k] })).filter(r => r.v > 0).sort((a, b) => b.v - a.v);
+    if (!rows.length){
+      nwAlloc.innerHTML = '<div class="empty-state"><strong>No assets yet</strong>Add one below to see how they are split.</div>';
+    } else {
+      nwAlloc.innerHTML =
+        '<div class="nw-stack">' + rows.map((r, i) => '<i style="width:' + (r.v / A * 100).toFixed(2) + '%;background:' + PALETTE[i % PALETTE.length] + '" title="' + esc(r.name) + '"></i>').join('') + '</div>' +
+        rows.map((r, i) => '<div class="nw-leg"><span><span class="sw" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' + esc(r.name) + '</span><span><b>' + fmt(r.v) + '</b> · ' + Math.round(r.v / A * 100) + '%</span></div>').join('');
+    }
+
+    // ---- item list ----
+    if (!accounts.length){
+      nwList.innerHTML = '<div class="empty-state"><strong>Nothing tracked yet</strong>Add your first asset or liability above.</div>';
+      return;
+    }
+    const itemHtml = a => {
+      const liab = a.kind === 'liability';
+      const last = a.history[a.history.length - 1];
+      const prevH = a.history.length > 1 ? a.history[a.history.length - 2] : null;
+      let delta = '';
+      if (prevH){
+        const diff = last.v - prevH.v;
+        const good = liab ? diff <= 0 : diff >= 0;
+        delta = ' · <span class="' + (good ? 'good' : 'bad') + '">' + (diff >= 0 ? '▲ ' : '▼ ') + fmt(Math.abs(diff)) + '</span>';
+      }
+      const hist = a.history.slice().reverse().map(h => '<div><span>' + esc(fmtDay(h.d)) + '</span><b>' + fmt(h.v) + '</b></div>').join('');
+      return '<div class="nw-item" data-id="' + esc(a.id) + '">' +
+        '<div><div class="nw-name">' + esc(a.name) + '</div><div class="nw-meta"><span class="tag">' + esc(a.cls) + '</span> · updated ' + esc(fmtDay(last.d)) + delta + '</div></div>' +
+        '<div class="nw-val' + (liab ? ' neg' : '') + '">' + (liab ? '-' : '') + fmt(last.v) + '</div>' +
+        '<div class="nw-act"><input type="number" class="nw-upd" placeholder="New value" step="0.01" min="0" inputmode="decimal" aria-label="New value">' +
+          '<input type="date" class="nw-upd-date" value="' + tk + '" max="' + tk + '" aria-label="As at date">' +
+          '<button type="button" class="nw-save">Update</button>' +
+          '<button type="button" class="void-btn nw-del" aria-label="Delete ' + esc(a.name) + '">&times;</button></div>' +
+        '<details class="nw-hist"><summary>History (' + a.history.length + ')</summary>' + hist + '</details></div>';
+    };
+    const group = (kind, title) => {
+      const list = accounts.filter(a => (a.kind === 'liability') === (kind === 'liability')).sort((a, b) => accCurrent(b) - accCurrent(a));
+      return list.length ? '<div class="nw-group">' + title + '</div>' + list.map(itemHtml).join('') : '';
+    };
+    nwList.innerHTML = group('asset', 'Assets') + group('liability', 'Liabilities');
+  }
+
+  nwForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = nwName.value.trim();
+    const v = parseFloat(nwValue.value);
+    if (!name || !(v >= 0)) return;
+    let d = nwDate.value || todayKey();
+    if (d > todayKey()) d = todayKey();
+    accounts.push({
+      id: 'a' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      name, kind: nwKind.value, cls: nwCls.value,
+      history: [{ d, v }], ts: Date.now()
+    });
+    nwName.value = ''; nwValue.value = ''; nwDate.value = todayKey();
+    accountsChanged();
+    nwName.focus();
+  });
+
+  nwList.addEventListener('click', (e) => {
+    const item = e.target.closest('.nw-item');
+    if (!item) return;
+    const a = accounts.find(x => x.id === item.dataset.id);
+    if (!a) return;
+    if (e.target.closest('.nw-save')){
+      const inp = item.querySelector('.nw-upd');
+      const v = parseFloat(inp.value);
+      if (!(v >= 0)){ inp.focus(); return; }
+      let d = item.querySelector('.nw-upd-date').value || todayKey();
+      if (d > todayKey()) d = todayKey();
+      addSnapshot(a, d, v);
+      accountsChanged();
+    } else if (e.target.closest('.nw-del')){
+      if (confirm('Delete "' + a.name + '" and its whole history?')){
+        accounts = accounts.filter(x => x.id !== a.id);
+        accountsChanged();
+      }
+    }
+  });
+  nwList.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.classList.contains('nw-upd')){
+      e.preventDefault();
+      e.target.closest('.nw-item').querySelector('.nw-save').click();
+    }
+  });
+
+  // ---- tabs ----
+  const tabBtns = document.querySelectorAll('.tabs [data-tab]');
+  function showTab(t){
+    ['ledger', 'worth'].forEach(n => { document.getElementById('tab-' + n).hidden = n !== t; });
+    tabBtns.forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    try { localStorage.setItem('tacfundi_tab', t); } catch(e) {}
+    if (t === 'worth') renderWorth();
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+  // ============================================================
   // Notes & plans (future spending / income / anything else)
   // ============================================================
   const noteForm = document.getElementById('note-form');
@@ -1309,6 +1761,10 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   setInterval(tick, 1000);
   render();
   renderNotes();
+  renderWorth();
+  let savedTab = 'ledger';
+  try { savedTab = localStorage.getItem('tacfundi_tab') === 'worth' ? 'worth' : 'ledger'; } catch(e) {}
+  showTab(savedTab);
 
   // ============================================================
   // STEP 2 — Firebase sync (works offline, syncs when reconnected)
@@ -1327,7 +1783,7 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   async function pushToCloud(){
     if (!docRef || applyingRemote || !setDocFn) return;
     try {
-      await setDocFn(docRef, { entries, notes, updatedAt: Date.now() });
+      await setDocFn(docRef, { entries, notes, accounts, updatedAt: Date.now() });
       setStatus(navigator.onLine ? 'on' : 'pending', navigator.onLine ? 'Synced' : 'Saved locally — will sync when back online');
     } catch (err) {
       setStatus('pending', 'Saved locally — will sync when back online');
@@ -1368,6 +1824,11 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
             notes = snap.data().notes;
             saveNotes();
             renderNotes();
+          }
+          if (Array.isArray(snap.data().accounts)){
+            accounts = snap.data().accounts;
+            saveAccounts();
+            renderWorth();
           }
           render();
           applyingRemote = false;
