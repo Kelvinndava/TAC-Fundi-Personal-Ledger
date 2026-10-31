@@ -135,6 +135,50 @@ footer{text-align:center;margin-top:18px;font-size:0.66rem;color:var(--ink-soft)
 .btn-csv:hover:not(:disabled){background:var(--teal-bg);}
 .btn-csv:disabled{opacity:0.4;cursor:default;}
 
+/* ---------- categories + charts ---------- */
+#cat{flex:1;}
+.desc-wrap{min-width:0;}
+.cat-pick{flex:none;min-height:0;padding:2px 4px;font-size:0.72rem;border-radius:6px;color:var(--ink-soft);margin-top:3px;max-width:100%;}
+.charts{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden;}
+.charts-head{background:var(--ink);color:var(--paper);padding:10px 12px;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;}
+.chart-card{padding:14px;border-bottom:1px solid var(--paper-line);}
+.chart-card:last-child{border-bottom:none;}
+.chart-title{font-weight:700;font-size:0.8rem;letter-spacing:0.04em;color:var(--ink-soft);text-transform:uppercase;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 10px;font-size:0.7rem;color:var(--ink-soft);}
+.chart-legend span{display:inline-flex;align-items:center;gap:5px;}
+.chart-legend i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+.bars{display:flex;gap:6px;align-items:flex-end;}
+.bgroup{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:6px 2px 4px;min-height:0;border:1px solid transparent;border-radius:8px;background:none;cursor:pointer;}
+.bgroup:hover{background:var(--teal-bg);}
+.bgroup.active{background:var(--teal-bg);border-color:var(--teal);}
+.bpair{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:160px;}
+.bcol{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;flex:1;max-width:30px;min-width:0;height:100%;}
+.bval{font-size:0.58rem;font-weight:700;color:var(--ink-soft);margin-bottom:2px;white-space:nowrap;}
+.bar{width:100%;border-radius:4px 4px 0 0;}
+.bar.inc{background:var(--gold);}
+.bar.exp{background:var(--brick);}
+.blabel{text-align:center;font-size:0.68rem;font-weight:700;color:var(--ink);}
+.brk-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.seg{display:inline-flex;}
+.seg button{min-height:34px;padding:4px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;background:#fff;border:1px solid var(--ink);border-radius:0;}
+.seg button:first-child{border-radius:8px 0 0 8px;}
+.seg button:last-child{border-radius:0 8px 8px 0;border-left:none;}
+.seg button.on{background:var(--ink);color:var(--paper);}
+.brow{margin-bottom:10px;}
+.btop{display:flex;justify-content:space-between;gap:8px;font-size:0.82rem;margin-bottom:4px;}
+.btop .nm{font-weight:600;word-break:break-word;}
+.btop .vl{color:var(--ink-soft);white-space:nowrap;}
+.btop .vl b{color:var(--ink);}
+.btrack{height:10px;background:var(--paper-line);border-radius:999px;overflow:hidden;}
+.bfill{height:100%;border-radius:999px;}
+.bfill.exp{background:var(--brick);}
+.bfill.inc{background:var(--gold);}
+.chart-sub{margin:16px 0 8px;padding-top:12px;border-top:1px dashed var(--paper-line);font-weight:700;font-size:0.72rem;letter-spacing:0.04em;color:var(--ink-soft);text-transform:uppercase;}
+.top-row{display:flex;justify-content:space-between;gap:8px;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--paper-line);}
+.top-row:last-child{border-bottom:none;}
+.top-row .cnt{color:var(--ink-soft);font-size:0.7rem;margin-left:6px;}
+.top-row .amt{font-weight:700;white-space:nowrap;}
+
 /* ---------- notes & plans ---------- */
 .notes{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;box-shadow:var(--shadow);margin-top:24px;overflow:hidden;}
 .notes-head{background:var(--ink);color:var(--paper);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;}
@@ -285,6 +329,9 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
         <div class="row">
           <input type="date" id="entry-date" aria-label="Entry date" />
         </div>
+        <div class="row">
+          <select id="cat" aria-label="Category"></select>
+        </div>
       </form>
 
       <div class="filter-bar" id="filter-bar">
@@ -299,6 +346,31 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
       <div class="ledger-tools">
         <button type="button" class="btn-csv" id="csv-btn">Download CSV</button>
       </div>
+
+      <section class="charts" id="charts" aria-label="Charts">
+        <div class="charts-head">Charts</div>
+        <div class="chart-card">
+          <div class="chart-title">Income vs spend · last 6 months</div>
+          <div class="chart-legend">
+            <span><i style="background:var(--gold)"></i>Income</span>
+            <span><i style="background:var(--brick)"></i>Spent</span>
+            <span>Tap a month to open it</span>
+          </div>
+          <div class="bars" id="chart-bars"></div>
+        </div>
+        <div class="chart-card">
+          <div class="brk-head">
+            <div class="chart-title" id="brk-title">Where the money went</div>
+            <div class="seg">
+              <button type="button" id="brk-exp" class="on">Spending</button>
+              <button type="button" id="brk-inc">Income</button>
+            </div>
+          </div>
+          <div id="brk-cats"></div>
+          <div class="chart-sub" id="brk-top-title">Biggest items</div>
+          <div id="brk-top"></div>
+        </div>
+      </section>
 
       <section class="notes" id="notes" aria-label="Notes and plans">
         <div class="notes-head">
@@ -401,6 +473,16 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
   function fmt(n){ return 'R' + n.toLocaleString('en-ZA', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
   function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function saveLocal(){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(entries)); } catch(e) {} }
+
+  // Categories (optional per entry; older entries show as "Uncategorised")
+  const EXP_CATS = ['Groceries','Housing','Transport','Eating out','Bills & airtime','Health','Shopping','Entertainment','Education','Savings','Other'];
+  const INC_CATS = ['Salary','Business','Gifts','Other'];
+  const catInput = document.getElementById('cat');
+  function catOptions(type, sel, blank){
+    const list = type === 'income' ? INC_CATS : EXP_CATS;
+    return '<option value="">' + esc(blank) + '</option>' +
+      list.map(c => '<option value="' + esc(c) + '"' + (c === sel ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
+  }
 
   // ============================================================
   // Calendar + live clock
@@ -589,7 +671,10 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
       row.className = 'entry';
       row.innerHTML = `
         <div class="date-cell">${esc(entry.date || '')}</div>
-        <div class="desc" title="${esc(entry.desc)}">${esc(entry.desc)}</div>
+        <div class="desc-wrap">
+          <div class="desc" title="${esc(entry.desc)}">${esc(entry.desc)}</div>
+          <select class="cat-pick" data-id="${esc(entry.id)}" aria-label="Category">${catOptions(entry.type, entry.cat || '', 'No category')}</select>
+        </div>
         <div class="amt ${entry.type === 'income' ? 'credit' : 'debit'}">${entry.type === 'income' ? '+' : '-'}${fmt(val)}</div>
         <button class="void-btn" aria-label="Delete entry" data-id="${esc(entry.id)}">&times;</button>
       `;
@@ -608,6 +693,7 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     csvBtn.disabled = entries.length === 0;
 
     renderRatio(income, expenses);
+    renderCharts();
     renderCalendar();
     saveLocal();
   }
@@ -664,11 +750,13 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
       desc: descInput.value.trim(),
       amount: amountInput.value,
       type: typeInput.value,
+      cat: catInput.value,
       date: labelFor(when),
       ts: when.getTime()
     });
     descInput.value = '';
     amountInput.value = '';
+    catInput.value = '';
     dateInput.value = selected || todayKey();
     render();
     pushToCloud();
@@ -694,12 +782,13 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     if (!entries.length) return;
     const rows = entries.slice().sort((a, b) =>
       (Number(a.ts) || parseInt(a.id, 10) || 0) - (Number(b.ts) || parseInt(b.id, 10) || 0));
-    const lines = ['Date,Description,Type,Amount'];
+    const lines = ['Date,Description,Type,Category,Amount'];
     rows.forEach(en => {
       lines.push([
         csvCell(entryKey(en) || en.date || ''),
         csvCell(en.desc),
         csvCell(en.type === 'income' ? 'Income' : 'Expense'),
+        csvCell(en.cat || ''),
         (parseFloat(en.amount) || 0).toFixed(2)
       ].join(','));
     });
@@ -713,6 +802,132 @@ input.note-check{flex:none;width:20px;height:20px;min-height:0;padding:0;accent-
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
+
+  // ============================================================
+  // Categories + charts
+  // ============================================================
+  function fillCats(){ catInput.innerHTML = catOptions(typeInput.value, '', 'Category (optional)'); }
+  typeInput.addEventListener('change', fillCats);
+  fillCats();
+
+  // change a row's category (lets you tag older entries too)
+  itemList.addEventListener('change', (e) => {
+    const sel = e.target.closest('.cat-pick');
+    if (!sel) return;
+    const en = entries.find(x => String(x.id) === sel.dataset.id);
+    if (!en) return;
+    en.cat = sel.value;
+    render();
+    pushToCloud();
+  });
+
+  const chartBars = document.getElementById('chart-bars');
+  const brkTitle = document.getElementById('brk-title');
+  const brkCats = document.getElementById('brk-cats');
+  const brkTop = document.getElementById('brk-top');
+  const brkTopTitle = document.getElementById('brk-top-title');
+  const brkExp = document.getElementById('brk-exp');
+  const brkInc = document.getElementById('brk-inc');
+  let brkType = 'expense';
+
+  function compact(n){
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k';
+    return String(Math.round(n));
+  }
+
+  function renderCharts(){
+    // ---- income vs spend, last 6 months ending at the month in view ----
+    const months = [];
+    for (let i = 5; i >= 0; i--){
+      const d = new Date(viewY, viewM - i, 1);
+      months.push({ y:d.getFullYear(), m:d.getMonth(), inc:0, exp:0 });
+    }
+    const idx = {};
+    months.forEach((mo, i) => { idx[mo.y + '-' + pad(mo.m + 1) + '-'] = i; });
+    entries.forEach(en => {
+      const k = entryKey(en); if (!k) return;
+      const i = idx[k.slice(0, 8)]; if (i === undefined) return;
+      const v = parseFloat(en.amount) || 0;
+      if (en.type === 'income') months[i].inc += v; else months[i].exp += v;
+    });
+    const max = Math.max(1, ...months.map(mo => Math.max(mo.inc, mo.exp)));
+    const MAXPX = 130;
+    chartBars.innerHTML = months.map(mo => {
+      const d = new Date(mo.y, mo.m, 1);
+      const hi = mo.inc ? Math.max(3, Math.round(mo.inc / max * MAXPX)) : 0;
+      const he = mo.exp ? Math.max(3, Math.round(mo.exp / max * MAXPX)) : 0;
+      const active = scopeMonth && mo.y === viewY && mo.m === viewM;
+      const label = d.toLocaleDateString('en-ZA', { month:'short' });
+      const title = d.toLocaleDateString('en-ZA', { month:'long', year:'numeric' }) + ' — income ' + fmt(mo.inc) + ', spent ' + fmt(mo.exp);
+      return '<button type="button" class="bgroup' + (active ? ' active' : '') + '" data-y="' + mo.y + '" data-m="' + mo.m + '" title="' + esc(title) + '" aria-label="' + esc(title) + '">' +
+        '<div class="bpair">' +
+          '<div class="bcol"><span class="bval">' + (mo.inc ? compact(mo.inc) : '') + '</span><div class="bar inc" style="height:' + hi + 'px"></div></div>' +
+          '<div class="bcol"><span class="bval">' + (mo.exp ? compact(mo.exp) : '') + '</span><div class="bar exp" style="height:' + he + 'px"></div></div>' +
+        '</div><span class="blabel">' + esc(label) + '</span></button>';
+    }).join('');
+
+    // ---- where / what: breakdown for the month in view (or all time) ----
+    const isInc = brkType === 'income';
+    const monthPrefix = viewY + '-' + pad(viewM + 1) + '-';
+    const scopeTxt = scopeMonth ? new Date(viewY, viewM, 1).toLocaleDateString('en-ZA', { month:'long', year:'numeric' }) : 'all time';
+    brkTitle.textContent = (isInc ? 'Where income came from' : 'Where the money went') + ' · ' + scopeTxt;
+    brkTopTitle.textContent = isInc ? 'Biggest income items' : 'Biggest spending items';
+    brkExp.classList.toggle('on', !isInc);
+    brkInc.classList.toggle('on', isInc);
+
+    const list = entries.filter(en => {
+      if ((en.type === 'income') !== isInc) return false;
+      if (!scopeMonth) return true;
+      const k = entryKey(en);
+      return !!k && k.startsWith(monthPrefix);
+    });
+
+    if (list.length === 0){
+      brkCats.innerHTML = '<div class="empty-state"><strong>Nothing here yet</strong>No ' + (isInc ? 'income' : 'spending') + ' logged for this period.</div>';
+      brkTop.innerHTML = '';
+      return;
+    }
+
+    let total = 0;
+    const cats = {}, items = {};
+    list.forEach(en => {
+      const v = parseFloat(en.amount) || 0;
+      total += v;
+      const c = en.cat || 'Uncategorised';
+      cats[c] = (cats[c] || 0) + v;
+      const key = String(en.desc || '').trim().toLowerCase();
+      const it = items[key] || (items[key] = { name: String(en.desc || '').trim() || '(no description)', sum: 0, n: 0 });
+      it.sum += v; it.n++;
+    });
+
+    const catRows = Object.keys(cats).map(k => ({ name:k, v:cats[k] })).sort((a, b) => b.v - a.v);
+    const topV = catRows[0].v || 1;
+    brkCats.innerHTML = catRows.map(r => {
+      const pct = total > 0 ? Math.round(r.v / total * 100) : 0;
+      return '<div class="brow"><div class="btop"><span class="nm">' + esc(r.name) + '</span><span class="vl"><b>' + fmt(r.v) + '</b> · ' + pct + '%</span></div>' +
+        '<div class="btrack"><div class="bfill ' + (isInc ? 'inc' : 'exp') + '" style="width:' + Math.max(2, Math.round(r.v / topV * 100)) + '%"></div></div></div>';
+    }).join('');
+
+    const top = Object.keys(items).map(k => items[k]).sort((a, b) => b.sum - a.sum).slice(0, 5);
+    brkTop.innerHTML = top.map(it =>
+      '<div class="top-row"><span>' + esc(it.name) + (it.n > 1 ? '<span class="cnt">×' + it.n + '</span>' : '') + '</span><span class="amt">' + fmt(it.sum) + '</span></div>'
+    ).join('');
+  }
+
+  chartBars.addEventListener('click', (e) => {
+    const g = e.target.closest('.bgroup');
+    if (!g) return;
+    viewY = Number(g.dataset.y); viewM = Number(g.dataset.m);
+    selected = null;
+    dateInput.value = todayKey();
+    noteDateInput.value = '';
+    scopeMonth = true;
+    try { localStorage.setItem(SCOPE_KEY, 'month'); } catch(err) {}
+    render();
+  });
+  brkExp.addEventListener('click', () => { brkType = 'expense'; renderCharts(); });
+  brkInc.addEventListener('click', () => { brkType = 'income'; renderCharts(); });
 
   // ============================================================
   // Notes & plans (future spending / income / anything else)
